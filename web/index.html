@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Riftbound Heads-up!</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one-screen game. Each phase is a full-bleed screen; play screen splits into two tap halves (pass | correct). Single dark look by choice. */
+:root {
+  --bg: #0d1220;
+  --bg-2: #151c30;
+  --line: #2a3452;
+  --fg: #eef0f7;
+  --muted: #98a1bd;
+  --brass: #e2b45a;
+  --good: #35c98a;
+  --pass: #ef7b45;
+  --display: "Chakra Petch", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  overflow: hidden;
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.screen {
+  position: fixed; inset: 0;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column;
+  background:
+    radial-gradient(120% 80% at 50% -10%, #1f2a4a 0%, transparent 60%),
+    var(--bg);
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, label:focus-within { outline: 2px solid var(--brass); outline-offset: 3px; }
+
+/* Home */
+#home { overflow-y: auto; align-items: center; }
+.home-inner { width: 100%; max-width: 30rem; display: flex; flex-direction: column; gap: 1.5rem; padding-block: 1rem 2rem; margin: auto 0; }
+.brand { display: flex; flex-direction: column; gap: .35rem; }
+.eyebrow { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.4rem, 11vw, 3.4rem); line-height: .95; margin: 0; text-wrap: balance; }
+h1 span { color: var(--brass); }
+.sub { color: var(--muted); margin: 0; line-height: 1.5; }
+.group { display: flex; flex-direction: column; gap: .6rem; }
+.label { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.decks { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.deck { position: relative; display: flex; flex-direction: column; gap: .2rem; padding: .8rem .9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-2); cursor: pointer; }
+.deck input { position: absolute; opacity: 0; pointer-events: none; }
+.deck b { font-family: var(--display); font-size: 1.05rem; font-weight: 700; }
+.deck small { color: var(--muted); font-size: .78rem; }
+.deck:has(input:checked) { border-color: var(--brass); background: color-mix(in srgb, var(--brass) 12%, var(--bg-2)); }
+.deck:has(input:checked) b::after { content: " ✓"; color: var(--brass); }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg label { flex: 1; text-align: center; padding: .7rem 0; cursor: pointer; font-variant-numeric: tabular-nums; font-weight: 600; background: var(--bg-2); }
+.seg label + label { border-left: 1px solid var(--line); }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label:has(input:checked) { background: var(--brass); color: #1a1406; }
+.start { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: .04em; padding: 1rem; border: 0; border-radius: 12px; background: var(--brass); color: #1a1406; }
+.start:disabled { opacity: .4; cursor: not-allowed; }
+.how { display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none; color: var(--muted); font-size: .9rem; line-height: 1.45; }
+.how li { display: grid; grid-template-columns: 1.6rem 1fr; }
+.how li span { color: var(--brass); font-family: var(--display); font-weight: 700; }
+.fine { font-size: .75rem; color: var(--muted); opacity: .75; margin: 0; }
+.err { color: var(--pass); font-size: .85rem; margin: 0; min-height: 1.2em; }
+
+/* Ready + countdown */
+#ready { align-items: center; justify-content: center; text-align: center; gap: 1.2rem; cursor: pointer; }
+#ready h2 { font-family: var(--display); font-size: clamp(1.6rem, 7vw, 2.6rem); margin: 0; text-wrap: balance; }
+#ready p { color: var(--muted); margin: 0; max-width: 28rem; line-height: 1.5; }
+.count { font-family: var(--display); font-weight: 700; font-size: clamp(6rem, 30vmin, 14rem); color: var(--brass); line-height: 1; font-variant-numeric: tabular-nums; }
+
+/* Play */
+#play { padding: 0; }
+.hud { position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; justify-content: space-between; align-items: center;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  pointer-events: none; font-family: var(--display); font-weight: 700; font-variant-numeric: tabular-nums; }
+.hud .time { font-size: 1.6rem; }
+.hud .time.low { color: var(--pass); }
+.hud .score { font-size: 1.1rem; color: var(--good); }
+.zones { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; }
+.zone { border: 0; background: transparent; display: flex; align-items: flex-end; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
+.zone.pass { justify-content: flex-start; padding-left: max(16px, env(safe-area-inset-left, 0px)); color: var(--pass); }
+.zone.good { justify-content: flex-end; padding-right: max(16px, env(safe-area-inset-right, 0px)); color: var(--good); border-left: 1px dashed var(--line); }
+.card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem; pointer-events: none; padding: 3.5rem max(16px, env(safe-area-inset-right, 0px)) 3.5rem max(16px, env(safe-area-inset-left, 0px)); text-align: center; }
+.card .deckname { font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; color: var(--brass); }
+.card .word { font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 13vmin, 7rem); line-height: 1; text-wrap: balance; overflow-wrap: anywhere; max-width: 100%; }
+.flash { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-size: clamp(3rem, 16vmin, 8rem); color: #0d1220; pointer-events: none; }
+.flash.good { background: var(--good); }
+.flash.pass { background: var(--pass); }
+
+/* End */
+#end { overflow-y: auto; align-items: center; }
+.end-inner { width: 100%; max-width: 30rem; display: flex; flex-direction: column; gap: 1.25rem; padding-block: 1rem 2rem; }
+.big { font-family: var(--display); font-weight: 700; font-size: clamp(4rem, 22vw, 6rem); line-height: 1; color: var(--brass); font-variant-numeric: tabular-nums; }
+.results { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.results li { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem .9rem; background: var(--bg-2); }
+.results li + li { border-top: 1px solid var(--line); }
+.results .w { min-width: 0; overflow-wrap: anywhere; }
+.results .tag { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; flex-shrink: 0; align-self: center; }
+.results .ok .tag { color: var(--good); }
+.results .no .tag { color: var(--pass); }
+.results .no .w { color: var(--muted); }
+.row { display: flex; gap: .6rem; flex-wrap: wrap; }
+.row .start { flex: 1 1 10rem; }
+.ghost { flex: 1 1 10rem; padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: transparent; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<section class="screen" id="home">
+  <div class="home-inner">
+    <div class="brand">
+      <div class="eyebrow">A party game for the Rift</div>
+      <h1>Riftbound <span>Heads-up!</span></h1>
+      <p class="sub">Hold the phone to your forehead. Your friends shout clues. Guess the champion, region or card term before time runs out.</p>
+    </div>
+
+    <div class="group">
+      <div class="label">Decks</div>
+      <div class="decks" id="decks"></div>
+    </div>
+
+    <div class="group">
+      <div class="label">Round length</div>
+      <div class="seg" role="radiogroup" aria-label="Round length">
+        <label><input type="radio" name="len" id="len30" value="30">30s</label>
+        <label><input type="radio" name="len" id="len60" value="60" checked>60s</label>
+        <label><input type="radio" name="len" id="len90" value="90">90s</label>
+      </div>
+    </div>
+
+    <p class="err" id="err" aria-live="polite"></p>
+    <button class="start" id="startBtn">Start round</button>
+
+    <div class="group">
+      <div class="label">How to play</div>
+      <ol class="how">
+        <li><span>1</span>Turn the phone sideways and hold it on your forehead, screen facing your friends.</li>
+        <li><span>2</span>Tap the <b style="color:var(--good)">right half</b> when you guess it. Tap the <b style="color:var(--pass)">left half</b> to pass.</li>
+        <li><span>3</span>On a keyboard: → or Enter for correct, ← or Space to pass.</li>
+      </ol>
+    </div>
+    <p class="fine">Unofficial fan game. Not affiliated with or endorsed by Riot Games.</p>
+  </div>
+</section>
+
+<section class="screen" id="ready" hidden>
+  <div id="readyMsg">
+    <h2>Phone on your forehead</h2>
+    <p>Screen facing out. Tap anywhere when you're ready.</p>
+  </div>
+  <div class="count" id="count" hidden>3</div>
+</section>
+
+<section class="screen" id="play" hidden>
+  <div class="hud"><span class="time" id="time">60</span><span class="score" id="score">0</span></div>
+  <div class="zones">
+    <button class="zone pass" id="passZone" aria-label="Pass">← Pass</button>
+    <button class="zone good" id="goodZone" aria-label="Correct">Correct →</button>
+  </div>
+  <div class="card"><div class="deckname" id="deckname"></div><div class="word" id="word"></div></div>
+  <div class="flash" id="flash" hidden></div>
+</section>
+
+<section class="screen" id="end" hidden>
+  <div class="end-inner">
+    <div class="brand">
+      <div class="eyebrow">Time! You got</div>
+      <div class="big" id="final">0</div>
+      <p class="sub" id="finalSub"></p>
+    </div>
+    <ul class="results" id="results"></ul>
+    <div class="row">
+      <button class="start" id="againBtn">Play again</button>
+      <button class="ghost" id="decksBtn">Change decks</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const DECKS = {
+  champions: { name: "Champions", hint: "Jinx, Garen, Ahri…", words: [
+    "Jinx","Vi","Caitlyn","Ekko","Viktor","Jayce","Heimerdinger","Ahri","Yasuo","Yone","Lee Sin","Master Yi","Irelia","Karma","Garen","Lux","Jarvan IV","Fiora","Darius","Draven","Katarina","Swain","Sett","Teemo","Annie","Volibear","Ashe","Sejuani","Braum","Lissandra","Miss Fortune","Gangplank","Pyke","Nautilus","Thresh","Kalista","Viego","Azir","Sivir","Nasus","Renekton","Xerath","Leona","Diana","Pantheon","Aphelios","Kai'Sa","Vel'Koz","Cho'Gath","Bel'Veth","Ezreal","Blitzcrank","Zed","Shen","Akali","Kennen","Rumble","Tristana","Lulu","Veigar","Malphite","Ornn","Anivia","Twisted Fate","Nami","Milio","Qiyana","Neeko","Rengar","Kindred","Morgana","Kayle","Seraphine","Senna","Lucian","Mordekaiser","Sylas","Galio","Poppy","Wukong","Rammus","Singed","Warwick","Zeri","Tibbers"
+  ]},
+  places: { name: "Regions & Places", hint: "Demacia, Zaun…", words: [
+    "Demacia","Noxus","Ionia","Piltover","Zaun","Freljord","Shurima","Mount Targon","Bilgewater","Shadow Isles","Ixtal","Bandle City","The Void","Runeterra","Summoner's Rift","Howling Abyss","The Undercity","The Sun Disc","Fountain","Top Lane","Mid Lane","Bot Lane","The Jungle","River","Nexus","Inhibitor","Turret","Baron Pit","Dragon Pit","Blue Side","Red Side"
+  ]},
+  terms: { name: "Card Game Terms", hint: "Rune, Battlefield…", words: [
+    "Rune","Battlefield","Legend","Champion unit","Signature card","Spell","Gear","Unit","Deck","Mulligan","Draw a card","Discard","Exhaust","Ready","Might","Energy","Power","Score a point","Conquer","Hold","Showdown","Combat","Attacker","Defender","Tank","Shield","Deathknell","Hidden","Accelerate","Reaction","Recycle","Buff","Token","Trash","Base","Starter deck","Booster pack","Foil card","Alternate art","Card sleeves","Playmat","Top deck","Topdecking","Tournament","Fury","Calm","Mind","Body","Chaos","Order"
+  ]},
+  rift: { name: "Monsters & Items", hint: "Baron, Blue Buff…", words: [
+    "Baron Nashor","Elder Dragon","Rift Herald","Void Grubs","Blue Buff","Red Buff","Scuttle Crab","Gromp","Krugs","Raptors","Murk Wolves","Minion wave","Cannon minion","Super minion","Poro","Infinity Edge","Rabadon's Deathcap","Blade of the Ruined King","Zhonya's Hourglass","Trinity Force","Health potion","Control ward","Flash","Ignite","Teleport","Smite","Recall","Pentakill","First Blood","Ace","Gank","Backdoor","Hextech","Shimmer","Chemtech","Petricite","Golden Spatula","Teemo mushroom"
+  ]}
+};
+
+const $ = id => document.getElementById(id);
+const screens = ["home","ready","play","end"];
+function show(name){ screens.forEach(s => $(s).hidden = s !== name); }
+
+// Deck chips
+const deckWrap = $("decks");
+Object.entries(DECKS).forEach(([key, d], i) => {
+  const lab = document.createElement("label");
+  lab.className = "deck";
+  const inp = document.createElement("input");
+  inp.type = "checkbox"; inp.id = "deck-" + key; inp.value = key; inp.checked = i < 2;
+  const b = document.createElement("b"); b.textContent = d.name;
+  const sm = document.createElement("small"); sm.textContent = d.words.length + " cards · " + d.hint;
+  lab.append(inp, b, sm);
+  deckWrap.append(lab);
+});
+function prefsSave(){ try { localStorage.setItem("rhu-prefs", JSON.stringify({ decks: chosenDecks(), len: roundLen() })); } catch(e){} }
+function prefsLoad(){
+  try {
+    const p = JSON.parse(localStorage.getItem("rhu-prefs") || "null");
+    if (!p) return;
+    if (Array.isArray(p.decks) && p.decks.length) document.querySelectorAll("#decks input").forEach(i => i.checked = p.decks.includes(i.value));
+    const r = document.querySelector('input[name="len"][value="' + Number(p.len) + '"]'); if (r) r.checked = true;
+  } catch(e){}
+}
+const chosenDecks = () => [...document.querySelectorAll("#decks input:checked")].map(i => i.value);
+const roundLen = () => Number(document.querySelector('input[name="len"]:checked').value);
+prefsLoad();
+
+// Audio (starts only after a tap)
+let actx = null;
+function beep(freq, dur = .12, type = "sine", vol = .18){
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + dur);
+    o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime + dur);
+  } catch(e){}
+}
+function buzz(ms){ try { navigator.vibrate && navigator.vibrate(ms); } catch(e){} }
+
+let wake = null;
+async function keepAwake(){ try { wake = await navigator.wakeLock.request("screen"); } catch(e){ wake = null; } }
+function releaseAwake(){ try { wake && wake.release(); } catch(e){} wake = null; }
+
+// Game state
+const seen = new Set();
+let pool = [], current = null, results = [], endAt = 0, tick = null, locked = false, lastSec = null, phase = "home";
+
+function shuffle(a){ for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function buildPool(){
+  const all = [];
+  chosenDecks().forEach(k => DECKS[k].words.forEach(w => all.push({ w, deck: DECKS[k].name })));
+  let fresh = all.filter(c => !seen.has(c.w));
+  if (fresh.length < 10) { all.forEach(c => seen.delete(c.w)); fresh = all; }
+  pool = shuffle(fresh);
+}
+function nextCard(){
+  if (!pool.length) buildPool();
+  current = pool.pop(); seen.add(current.w);
+  $("word").textContent = current.w;
+  $("deckname").textContent = current.deck;
+}
+
+$("startBtn").addEventListener("click", () => {
+  if (!chosenDecks().length) { $("err").textContent = "Pick at least one deck to play."; return; }
+  $("err").textContent = "";
+  prefsSave(); beep(1, .01, "sine", .0001);
+  try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); } catch(e){}
+  goReady();
+});
+document.querySelectorAll("#decks input").forEach(i => i.addEventListener("change", () => { if (chosenDecks().length) $("err").textContent = ""; }));
+
+function goReady(){
+  phase = "ready"; show("ready");
+  $("readyMsg").hidden = false; $("count").hidden = true;
+  keepAwake();
+}
+$("ready").addEventListener("click", startCountdown);
+let counting = false;
+function startCountdown(){
+  if (phase !== "ready" || counting) return;
+  counting = true;
+  $("readyMsg").hidden = true; $("count").hidden = false;
+  let n = 3; $("count").textContent = n; beep(520);
+  const iv = setInterval(() => {
+    n--;
+    if (n > 0) { $("count").textContent = n; beep(520); }
+    else { clearInterval(iv); counting = false; beep(880, .25); startRound(); }
+  }, 900);
+}
+
+function startRound(){
+  phase = "play"; results = []; locked = false; lastSec = null;
+  buildPool(); nextCard();
+  $("score").textContent = "0";
+  endAt = performance.now() + roundLen() * 1000;
+  show("play"); renderTime();
+  tick = setInterval(renderTime, 100);
+}
+function renderTime(){
+  const left = Math.max(0, Math.ceil((endAt - performance.now()) / 1000));
+  $("time").textContent = left;
+  $("time").classList.toggle("low", left <= 5);
+  if (left !== lastSec && left <= 5 && left > 0) beep(660, .08, "square", .08);
+  lastSec = left;
+  if (left <= 0) finish();
+}
+function answer(ok){
+  if (phase !== "play" || locked) return;
+  locked = true;
+  results.push({ w: current.w, ok });
+  $("score").textContent = results.filter(r => r.ok).length;
+  const f = $("flash");
+  f.className = "flash " + (ok ? "good" : "pass");
+  f.textContent = ok ? "Correct!" : "Pass";
+  f.hidden = false;
+  if (ok) { beep(784, .1); setTimeout(() => beep(1046, .16), 90); buzz(40); } else { beep(220, .22, "triangle"); buzz([20, 40, 20]); }
+  setTimeout(() => { f.hidden = true; if (phase === "play") { nextCard(); locked = false; } }, 650);
+}
+$("goodZone").addEventListener("click", () => answer(true));
+$("passZone").addEventListener("click", () => answer(false));
+document.addEventListener("keydown", e => {
+  if (phase === "play") {
+    if (e.key === "ArrowRight" || e.key === "Enter") { e.preventDefault(); answer(true); }
+    else if (e.key === "ArrowLeft" || e.key === " ") { e.preventDefault(); answer(false); }
+  } else if (phase === "ready" && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); startCountdown(); }
+});
+
+function finish(){
+  if (phase !== "play") return;
+  clearInterval(tick); phase = "end";
+  if (current && !locked) results.push({ w: current.w, ok: false, timeout: true });
+  beep(330, .2, "sawtooth", .1); setTimeout(() => beep(247, .35, "sawtooth", .1), 180); buzz(200);
+  releaseAwake();
+  const got = results.filter(r => r.ok).length;
+  $("final").textContent = got;
+  $("finalSub").textContent = got === 1 ? "1 correct guess. Can your friends beat it?" : got + " correct guesses. Can your friends beat it?";
+  const ul = $("results"); ul.replaceChildren();
+  results.forEach(r => {
+    const li = document.createElement("li"); li.className = r.ok ? "ok" : "no";
+    const w = document.createElement("span"); w.className = "w"; w.textContent = r.w;
+    const t = document.createElement("span"); t.className = "tag"; t.textContent = r.ok ? "Got it" : (r.timeout ? "Time" : "Passed");
+    li.append(w, t); ul.append(li);
+  });
+  show("end");
+}
+$("againBtn").addEventListener("click", goReady);
+$("decksBtn").addEventListener("click", () => { phase = "home"; show("home"); try { document.fullscreenElement && document.exitFullscreen(); } catch(e){} });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && (phase === "play" || phase === "ready")) keepAwake(); });
+</script>
+
+</body>
+</html>
