@@ -97,50 +97,47 @@ h1 span { color: var(--brass); }
 .count { font-family: var(--display); font-weight: 700; font-size: clamp(6rem, 30vmin, 14rem); color: var(--brass); line-height: 1; font-variant-numeric: tabular-nums; }
 
 /* Play */
+/* Sideways: card image full height on the left; on the right a column of
+   [Time | Score] bar, the card details (auto-sized to fill), and the answer hints.
+   Upright: the same pieces stack: bar, image, details, hints. */
 #play { padding: 0; }
-.hud { position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
-  padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  pointer-events: none; font-family: var(--display); font-weight: 700; font-variant-numeric: tabular-nums; }
-.hud .time { font-size: 1.6rem; }
-.hud .time.low { color: var(--pass); }
-.hud .score { font-size: 1.1rem; color: var(--good); }
-.hud .mode { font-family: var(--body); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .zones { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; }
-.zone { border: 0; background: transparent; display: flex; align-items: flex-end; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
-.zone.pass { justify-content: flex-start; padding-left: max(16px, env(safe-area-inset-left, 0px)); color: var(--pass); }
-.zone.good { justify-content: flex-end; padding-right: max(16px, env(safe-area-inset-right, 0px)); color: var(--good); border-left: 1px dashed var(--line); }
-/* Card on the left, as big as the screen allows; every detail on the right (stacked in portrait). */
-.card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5vmin; pointer-events: none;
-  padding: calc(env(safe-area-inset-top, 0px) + 2.9rem) max(14px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 2.4rem) max(14px, env(safe-area-inset-left, 0px)); }
-.cardimg { display: block; flex: 0 0 auto; max-width: 92vw; max-height: 52vh; width: auto; height: auto; object-fit: contain; border-radius: 3.5% / 2.5%; box-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 0 1px var(--line); background: var(--bg-2); }
-.cardimg.wide { max-height: 40vh; }
-.card .info { box-sizing: border-box; flex: 1 1 0; min-height: 0; width: 100%; max-width: 40rem; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: .45em; font-size: 16px; text-align: left; }
+.zone { border: 0; background: transparent; }
+.card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: stretch; gap: 10px; pointer-events: none;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) max(12px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 10px) max(12px, env(safe-area-inset-left, 0px)); }
+.cardimg { display: block; align-self: center; flex: 0 1 auto; min-height: 0; max-width: 92vw; max-height: 44vh; width: auto; height: auto; object-fit: contain; border-radius: 3.5% / 2.5%; box-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 0 1px var(--line); background: var(--bg-2); }
+.cardimg.wide { max-height: 34vh; }
+.side { display: contents; }
+.hud { order: -1; display: flex; justify-content: space-between; align-items: center; gap: .75rem; }
+.pill { display: inline-flex; align-items: baseline; gap: .35em; padding: .25em .75em; border-radius: 10px; background: var(--bg-2); border: 1px solid var(--line);
+  font-family: var(--display); font-weight: 700; font-size: clamp(1.15rem, 5vmin, 1.7rem); font-variant-numeric: tabular-nums; line-height: 1.2; }
+.pill span { color: var(--muted); font-size: .72em; font-weight: 600; }
+.pill.time.low { border-color: var(--pass); color: var(--pass); }
+.pill.score b { color: var(--good); }
+.hints { display: flex; justify-content: space-between; gap: 1rem; font-size: clamp(.7rem, 2.6vmin, .85rem); letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+.hints .p { color: var(--pass); } .hints .g { color: var(--good); }
+.card .info { --accent: var(--line); box-sizing: border-box; flex: 1 1 0; min-height: 0; min-width: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: .38em; font-size: 16px; text-align: left; }
 /* Auto margins center the details while still letting overflow be measured from the top. */
 .card .info > .meta { margin-top: auto; }
 .card .info > .foot { margin-bottom: auto; }
 @media (orientation: landscape) {
-  /* Card fills the full height; timer, score and tap hints move beside it. */
-  .card { flex-direction: row; align-items: stretch; padding-top: calc(env(safe-area-inset-top, 0px) + 8px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); }
-  .cardimg { align-self: center; max-height: 100%; max-width: 52vw; }
-  .cardimg.wide { max-width: 58vw; max-height: 100%; }
-  .card .info { height: 100%; max-width: none; padding-block: 2.6rem 2rem; }
-  #play .hud { left: var(--card-right, 0px); }
-  #play .zone.pass { padding-left: calc(var(--card-right, 0px) + 6px); }
+  .card { flex-direction: row; gap: 14px; }
+  .cardimg { max-height: 100%; max-width: 50vw; }
+  .cardimg.wide { max-width: 56vw; max-height: 100%; }
+  .side { display: flex; flex-direction: column; flex: 1 1 0; min-width: 0; gap: 8px; }
 }
-.card .meta { font-size: .78em; letter-spacing: .1em; text-transform: uppercase; color: var(--fg); font-weight: 700; }
-.card .word { font-family: var(--display); font-weight: 700; font-size: 2.3em; line-height: 1; text-wrap: balance; overflow-wrap: anywhere; }
-.card .subword { font-family: var(--display); font-weight: 500; font-size: 1.3em; line-height: 1.1; color: var(--brass); text-wrap: balance; }
-.card .stats { display: flex; flex-wrap: wrap; gap: .35em; }
-.card .stat { display: inline-flex; align-items: baseline; gap: .35em; padding: .25em .6em; border: 1px solid var(--line); border-radius: 999px; background: var(--bg-2); font-size: .9em; }
+.card .meta { font-size: .72em; letter-spacing: .1em; text-transform: uppercase; color: var(--fg); font-weight: 700; }
+.card .word { font-family: var(--display); font-weight: 700; font-size: 2.1em; line-height: 1; text-wrap: balance; overflow-wrap: anywhere; }
+.card .subword { font-family: var(--display); font-weight: 500; font-size: 1.2em; line-height: 1.1; color: var(--brass); text-wrap: balance; margin-top: -.15em; }
+.card .stats { display: flex; flex-wrap: wrap; gap: .3em; }
+.card .stat { display: inline-flex; align-items: baseline; gap: .3em; padding: .15em .55em; border: 1px solid var(--line); border-radius: 999px; background: var(--bg-2); font-size: .85em; }
 .card .stat b { font-family: var(--display); font-size: 1.25em; font-variant-numeric: tabular-nums; color: var(--fg); }
-.card .stat span { color: var(--muted); font-size: .8em; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+.card .stat span { color: var(--muted); font-size: .78em; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
 .card .tags { display: flex; flex-wrap: wrap; gap: .3em; }
-.card .tag { font-size: .78em; padding: .15em .55em; border-radius: 4px; background: color-mix(in srgb, var(--brass) 16%, var(--bg-2)); color: var(--brass); font-weight: 600; }
-.card .rules { font-size: 1em; line-height: 1.4; color: var(--fg); white-space: pre-line; }
-.card .flavour { font-size: .85em; line-height: 1.4; color: var(--muted); font-style: italic; }
-.card .foot { font-size: .72em; color: var(--muted); letter-spacing: .02em; }
+.card .tag { font-size: .72em; padding: .12em .5em; border-radius: 4px; background: color-mix(in srgb, var(--brass) 16%, var(--bg-2)); color: var(--brass); font-weight: 600; }
+.card .rules { font-size: .92em; line-height: 1.32; color: var(--fg); white-space: pre-line; background: var(--bg-2); border-left: .22em solid var(--accent); border-radius: .3em; padding: .4em .65em; }
+.card .flavour { font-size: .75em; line-height: 1.35; color: var(--muted); font-style: italic; }
+.card .foot { font-size: .62em; color: var(--muted); letter-spacing: .02em; }
 .dom-red { color: var(--dom-red); } .dom-green { color: var(--dom-green); } .dom-blue { color: var(--dom-blue); }
 .dom-orange { color: var(--dom-orange); } .dom-purple { color: var(--dom-purple); } .dom-yellow { color: var(--dom-yellow); }
 .flash { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-size: clamp(3rem, 16vmin, 8rem); color: #0d1220; pointer-events: none; }
@@ -232,13 +229,17 @@ h1 span { color: var(--brass); }
 </section>
 
 <section class="screen" id="play" hidden>
-  <div class="hud"><span class="time" id="time">60</span><span class="mode" id="ctrlMode"></span><span class="score" id="score">0</span></div>
   <div class="zones">
-    <button class="zone pass" id="passZone" aria-label="Pass">← Pass</button>
-    <button class="zone good" id="goodZone" aria-label="Correct">Correct →</button>
+    <button class="zone pass" id="passZone" aria-label="Pass"></button>
+    <button class="zone good" id="goodZone" aria-label="Correct"></button>
   </div>
   <div class="card" id="card">
     <img class="cardimg" id="cardImg" alt="" hidden>
+    <div class="side">
+    <div class="hud">
+      <span class="pill time" id="timePill"><span>Time:</span><b id="time">60</b></span>
+      <span class="pill score"><span>Score:</span><b id="score">0</b></span>
+    </div>
     <div class="info" id="info">
       <div class="meta" id="meta"></div>
       <div class="word" id="word"></div>
@@ -248,6 +249,8 @@ h1 span { color: var(--brass); }
       <div class="rules" id="rules"></div>
       <div class="flavour" id="flavour"></div>
       <div class="foot" id="foot"></div>
+    </div>
+    <div class="hints"><span class="p" id="hintPass">← Tap left: Pass</span><span class="g" id="hintGood">Tap right: Correct →</span></div>
     </div>
   </div>
   <div class="flash" id="flash" hidden></div>
@@ -500,6 +503,9 @@ function nextCard() {
   (current.tags || []).forEach(t => { const s = document.createElement("span"); s.className = "tag"; s.textContent = t; tags.append(s); });
   tags.hidden = !tags.childElementCount;
 
+  // Rules box edge takes the card's first color.
+  const firstColor = DOMAIN_COLOR[domainList(current)[0]];
+  $("info").style.setProperty("--accent", firstColor ? "var(--dom-" + firstColor + ")" : "var(--line)");
   $("rules").textContent = current.text || "";
   $("rules").hidden = !current.text;
   $("flavour").textContent = current.flavour || "";
@@ -515,14 +521,12 @@ function nextCard() {
 function fitInfo() {
   const info = $("info"), img = $("cardImg");
   if (phase !== "play" || !info.clientHeight) return;
-  const right = !img.hidden && img.naturalWidth ? Math.round(img.getBoundingClientRect().right) : 0;
-  $("play").style.setProperty("--card-right", right + "px");
-  let size = Math.min(24, Math.max(14, Math.round(Math.min(innerWidth, innerHeight) / 18)));
-  info.style.fontSize = size + "px";
-  while (size > 9 && (info.scrollHeight > info.clientHeight + 1 || info.scrollWidth > info.clientWidth + 1)) {
-    size -= 0.5;
-    info.style.fontSize = size + "px";
-  }
+  // Largest text size that still fits: binary search between 9px and 60px.
+  const fits = px => { info.style.fontSize = px + "px"; return info.scrollHeight <= info.clientHeight + 1 && info.scrollWidth <= info.clientWidth + 1; };
+  let lo = 9, hi = 60;
+  if (fits(hi)) return;
+  while (hi - lo > 0.5) { const mid = (lo + hi) / 2; if (fits(mid)) lo = mid; else hi = mid; }
+  fits(lo);
 }
 addEventListener("resize", () => fitInfo());
 
@@ -606,7 +610,8 @@ function startRound() {
   // Calibrate to however the phone sits on the forehead right now.
   tiltBase = tiltSeen && lastGz != null && Math.abs(lastGz) < 0.6 ? lastGz : 0;
   tiltState = tiltSeen ? "waiting" : "off";
-  $("ctrlMode").textContent = tiltSeen ? "Tilt up ✓ · down ✗" : "Tap to answer";
+  $("hintPass").textContent = tiltSeen ? "↓ Tilt down: Pass" : "← Tap left: Pass";
+  $("hintGood").textContent = tiltSeen ? "Tilt up: Correct ↑" : "Tap right: Correct →";
   buildPool(); nextCard();
   $("score").textContent = "0";
   endAt = performance.now() + roundLen() * 1000;
@@ -616,7 +621,7 @@ function startRound() {
 function renderTime() {
   const left = Math.max(0, Math.ceil((endAt - performance.now()) / 1000));
   $("time").textContent = left;
-  $("time").classList.toggle("low", left <= 5);
+  $("timePill").classList.toggle("low", left <= 5);
   if (left !== lastSec && left <= 5 && left > 0) beep(660, .08, "square", .08);
   lastSec = left;
   if (left <= 0) finish();
