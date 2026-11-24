@@ -50,7 +50,7 @@ button:focus-visible, label:focus-within { outline: 2px solid var(--brass); outl
 .home-inner { width: 100%; max-width: 32rem; display: flex; flex-direction: column; gap: 1.4rem; padding-block: 1rem 2rem; }
 .brand { display: flex; flex-direction: column; gap: .35rem; }
 .eyebrow, .label { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.4rem, 11vw, 3.4rem); line-height: .95; margin: 0; text-wrap: balance; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(1.4rem, 8vw, 3rem); line-height: 1; margin: 0; white-space: nowrap; }
 h1 span { color: var(--brass); }
 .sub { color: var(--muted); margin: 0; line-height: 1.5; }
 .filters { display: flex; flex-direction: column; gap: 1.4rem; }
@@ -69,6 +69,8 @@ h1 span { color: var(--brass); }
 .chip:has(input:checked) { border-color: var(--brass); background: color-mix(in srgb, var(--brass) 13%, var(--bg-2)); }
 .chip:has(input:checked) small { color: var(--brass); }
 .chip.off { opacity: .45; }
+#catChips { grid-template-columns: 1fr 1fr; }
+#catChips .chip.full { grid-column: 1 / -1; }
 .matchline { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: .8rem .9rem; border-radius: 10px; background: var(--bg-2); border: 1px solid var(--line); }
 .matchline b { font-family: var(--display); font-size: 1.5rem; color: var(--brass); font-variant-numeric: tabular-nums; }
 .start { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: .04em; padding: 1rem; border: 0; border-radius: 12px; background: var(--brass); color: #1a1406; }
@@ -167,7 +169,6 @@ h1 span { color: var(--brass); }
 <section class="screen" id="home">
   <div class="home-inner">
     <div class="brand">
-      <div class="eyebrow">A party game for the Rift</div>
       <h1>Riftbound <span>Heads-up!</span></h1>
       <p class="sub">Hold the phone to your forehead. Your friends describe the card. Tilt up when you get it, tilt down to pass.</p>
     </div>
@@ -204,7 +205,6 @@ h1 span { color: var(--brass); }
       </div>
 
       <div class="group">
-        <div class="matchline"><span>Cards selected</span><b id="matchCount">0</b></div>
         <p class="err" id="err" aria-live="polite"></p>
         <button class="start" id="startBtn">Start round</button>
       </div>
@@ -273,8 +273,9 @@ const $ = id => document.getElementById(id);
 const screens = ["home", "ready", "play", "end"];
 const show = name => screens.forEach(s => $(s).hidden = s !== name);
 
-const CAT_ORDER = ["Legend", "Champion Unit", "Unit", "Signature Unit", "Spell", "Signature Spell", "Gear", "Signature Gear", "Battlefield"];
-const CAT_LABEL = { "Legend": "Legends", "Champion Unit": "Champion Unit", "Unit": "Units", "Signature Unit": "Signature Unit", "Spell": "Spells", "Signature Spell": "Signature Spell", "Gear": "Gear", "Signature Gear": "Signature Gear", "Battlefield": "Battlefields" };
+// Two-column grid: Champion Unit | Units, Spells | Signature, Gear (full row), Battlefields | Legends
+const CAT_ORDER = ["Champion Unit", "Unit", "Spell", "Signature", "Gear", "Battlefield", "Legend"];
+const CAT_LABEL = { "Legend": "Legends", "Champion Unit": "Champion Unit", "Unit": "Units", "Spell": "Spells", "Signature": "Signature", "Gear": "Gear", "Battlefield": "Battlefields" };
 // Riftbound domains and their card colors.
 const DOMAIN_COLOR = { Fury: "red", Calm: "green", Mind: "blue", Body: "orange", Chaos: "purple", Order: "yellow" };
 // Battlefields have no color, so their type line is just "Battlefield".
@@ -331,6 +332,7 @@ function buildFilters() {
   const cats = CAT_ORDER.filter(c => DB.cards.some(x => x.cat === c));
   DB.cards.forEach(x => { if (!cats.includes(x.cat)) cats.push(x.cat); });
   cats.forEach(c => catChips[c] = makeChip($("catChips"), "cat-" + c.replace(/\W+/g, "-"), c, CAT_LABEL[c] || c));
+  if (catChips.Gear) catChips.Gear.lab.classList.add("full");   // keeps Battlefields | Legends together on the last row
   document.querySelectorAll('input[name="pool"]').forEach(i => i.addEventListener("change", syncFilters));
   $("setsToggle").addEventListener("click", () => toggleAll(setChips));
   $("catsToggle").addEventListener("click", () => toggleAll(catChips));
@@ -370,7 +372,6 @@ function syncFilters() {
   $("setsToggle").textContent = Object.values(setChips).some(c => !c.inp.checked) ? "Select all" : "Clear all";
   $("catsToggle").textContent = Object.values(catChips).some(c => !c.inp.checked) ? "Select all" : "Clear all";
   const n = matchingCards().length;
-  $("matchCount").textContent = n;
   $("startBtn").disabled = n < 1;
   $("err").textContent = n >= 1 ? "" : (!chosen(catChips).length ? "Pick at least one card type." : bySets && !chosen(setChips).length ? "Pick at least one set." : "No cards match. Try another set or card type.");
   prefsSave();

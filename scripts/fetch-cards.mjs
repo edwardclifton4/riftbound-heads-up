@@ -54,7 +54,7 @@ function category(c) {
   const type = c.classification?.type || "Other";
   const sup = c.classification?.supertype || "";
   if (type === "Unit" && /champion/i.test(sup)) return "Champion Unit";
-  if (/signature/i.test(sup) && ["Spell", "Unit", "Gear"].includes(type)) return `Signature ${type}`;
+  if (/signature/i.test(sup)) return "Signature"; // signature spells, units and gear are one group
   return type;
 }
 
