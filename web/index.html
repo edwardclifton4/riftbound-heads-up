@@ -224,8 +224,8 @@ h1 span { color: var(--brass); }
 
 <section class="screen" id="ready" hidden>
   <div id="readyMsg">
-    <h2>Phone on your forehead</h2>
-    <p>Sideways, screen facing out. Tap anywhere when you're ready.</p>
+    <h2>Turn your phone sideways</h2>
+    <p>The countdown starts as soon as it's sideways. Then hold it on your forehead, screen facing out. (Or tap anywhere to start.)</p>
     <div class="tiltinfo"><span class="up">Tilt up = correct</span><span class="down">Tilt down = pass</span></div>
   </div>
   <div class="count" id="count" hidden>3</div>
@@ -560,7 +560,33 @@ function goReady() {
   phase = "ready"; show("ready");
   $("readyMsg").hidden = false; $("count").hidden = true;
   keepAwake();
+  if (landscape.matches) autoStart();
+  // Safety net in case no rotation event arrives: check a few times a second while waiting.
+  clearInterval(readyPoll);
+  readyPoll = setInterval(() => {
+    if (phase !== "ready" || counting) { clearInterval(readyPoll); return; }
+    if (landscape.matches && !autoTimer) autoStart();
+  }, 300);
 }
+let readyPoll = null;
+
+// Start the countdown on its own once the phone is sideways.
+const landscape = matchMedia("(orientation: landscape)");
+let autoTimer = null;
+function autoStart() {
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(() => { autoTimer = null; if (phase === "ready" && landscape.matches) startCountdown(); }, 600);
+}
+function onOrientationChange() {
+  if (phase !== "ready" || counting) return;
+  if (landscape.matches) { if (!autoTimer) autoStart(); }
+  else { clearTimeout(autoTimer); autoTimer = null; }
+}
+if (landscape.addEventListener) landscape.addEventListener("change", onOrientationChange);
+else if (landscape.addListener) landscape.addListener(onOrientationChange);
+// Backups: not every browser fires the media-query change on rotation.
+addEventListener("resize", onOrientationChange);
+addEventListener("orientationchange", () => setTimeout(onOrientationChange, 200));
 $("ready").addEventListener("click", startCountdown);
 function startCountdown() {
   if (phase !== "ready" || counting) return;
