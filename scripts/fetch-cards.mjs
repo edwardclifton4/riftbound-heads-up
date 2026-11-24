@@ -63,6 +63,7 @@ for (const c of raw) {
   const set = c.set?.set_id;
   const name = baseName(c.name);
   if (!set || !name) continue;
+  if (category(c) === "Rune") continue; // runes are left out of the game
   const key = `${set}|${name.toLowerCase()}`;
   const variant = !!(c.metadata?.alternate_art || c.metadata?.overnumbered || c.metadata?.signature);
   const prev = byKey.get(key);
@@ -79,6 +80,8 @@ for (const c of raw) {
     domain: c.classification?.domain || [],
     rarity: c.classification?.rarity || null,
     text: cleanText(c.text?.plain).slice(0, 220),
+    img: c.media?.image_url || prev?.img || null,
+    wide: c.orientation === "landscape",
   });
 }
 

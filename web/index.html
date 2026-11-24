@@ -70,6 +70,9 @@ h1 span { color: var(--brass); }
 .how { display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none; color: var(--muted); font-size: .9rem; line-height: 1.45; }
 .how li { display: grid; grid-template-columns: 1.6rem 1fr; }
 .how li > span { color: var(--brass); font-family: var(--display); font-weight: 700; }
+.how li > div { min-width: 0; }
+.how .up { color: var(--good); }
+.how .down { color: var(--pass); }
 .fine { font-size: .75rem; color: var(--muted); opacity: .8; margin: 0; line-height: 1.5; }
 .fine a { color: var(--muted); }
 .err { color: var(--pass); font-size: .85rem; margin: 0; }
@@ -100,7 +103,18 @@ h1 span { color: var(--brass); }
 .zone { border: 0; background: transparent; display: flex; align-items: flex-end; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
 .zone.pass { justify-content: flex-start; padding-left: max(16px, env(safe-area-inset-left, 0px)); color: var(--pass); }
 .zone.good { justify-content: flex-end; padding-right: max(16px, env(safe-area-inset-right, 0px)); color: var(--good); border-left: 1px dashed var(--line); }
-.card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem; pointer-events: none; padding: 3.5rem max(20px, env(safe-area-inset-right, 0px)) 3.5rem max(20px, env(safe-area-inset-left, 0px)); text-align: center; }
+.card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; pointer-events: none; padding: 3.2rem max(20px, env(safe-area-inset-right, 0px)) 3.2rem max(20px, env(safe-area-inset-left, 0px)); text-align: center; }
+.card .info { display: flex; flex-direction: column; align-items: center; gap: .5rem; min-width: 0; max-width: 100%; }
+.cardimg { display: block; max-width: 80vw; max-height: 46vh; width: auto; height: auto; object-fit: contain; border-radius: 3.5% / 2.5%; box-shadow: 0 10px 40px rgba(0,0,0,.55), 0 0 0 1px var(--line); background: var(--bg-2); }
+.cardimg.wide { max-height: 34vh; }
+@media (orientation: landscape) {
+  .card { flex-direction: row; gap: 5vmin; }
+  .card .info { flex: 1 1 0; max-width: 46vw; }
+  .cardimg { max-height: calc(100vh - 7.5rem); max-width: 42vw; }
+  .cardimg.wide { max-width: 52vw; max-height: calc(100vh - 9rem); }
+  .card.has-img .word { font-size: clamp(2rem, 9vmin, 5rem); }
+}
+.card.has-img .rules { display: none; }
 .card .meta { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--brass); font-weight: 600; }
 .card .word { font-family: var(--display); font-weight: 700; font-size: clamp(2.4rem, 12vmin, 6.5rem); line-height: 1; text-wrap: balance; overflow-wrap: anywhere; max-width: 100%; }
 .card .subword { font-family: var(--display); font-weight: 500; font-size: clamp(1.2rem, 5vmin, 2.2rem); opacity: .85; text-wrap: balance; }
@@ -168,7 +182,7 @@ h1 span { color: var(--brass); }
       </div>
 
       <div class="group">
-        <div class="matchline"><span>Cards in this deck</span><b id="matchCount">0</b></div>
+        <div class="matchline"><span>Cards selected</span><b id="matchCount">0</b></div>
         <p class="err" id="err" aria-live="polite"></p>
         <button class="start" id="startBtn">Start round</button>
       </div>
@@ -177,9 +191,9 @@ h1 span { color: var(--brass); }
     <div class="group">
       <div class="label">How to play</div>
       <ol class="how">
-        <li><span>1</span>Turn the phone sideways and hold it on your forehead, screen facing your friends.</li>
-        <li><span>2</span>Tilt the phone <b style="color:var(--good)">up</b> when you guess it right (1 point). Tilt it <b style="color:var(--pass)">down</b> to pass.</li>
-        <li><span>3</span>No tilt sensor? Tap the right half for correct, the left half to pass. On a keyboard use → and ←.</li>
+        <li><span>1</span><div>Turn the phone sideways and hold it on your forehead, screen facing your friends.</div></li>
+        <li><span>2</span><div>Tilt the phone <b class="up">up</b> when you guess it right (1 point). Tilt it <b class="down">down</b> to pass.</div></li>
+        <li><span>3</span><div>No tilt sensor? Tap the right half for correct, the left half to pass. On a keyboard use → and ←.</div></li>
       </ol>
     </div>
     <p class="fine" id="credit">Unofficial fan game. Not affiliated with or endorsed by Riot Games. Card data from <a href="https://riftcodex.com" target="_blank" rel="noopener">Riftcodex</a>.</p>
@@ -201,11 +215,14 @@ h1 span { color: var(--brass); }
     <button class="zone pass" id="passZone" aria-label="Pass">← Pass</button>
     <button class="zone good" id="goodZone" aria-label="Correct">Correct →</button>
   </div>
-  <div class="card">
-    <div class="meta" id="meta"></div>
-    <div class="word" id="word"></div>
-    <div class="subword" id="subword"></div>
-    <div class="rules" id="rules"></div>
+  <div class="card" id="card">
+    <img class="cardimg" id="cardImg" alt="" hidden>
+    <div class="info">
+      <div class="meta" id="meta"></div>
+      <div class="word" id="word"></div>
+      <div class="subword" id="subword"></div>
+      <div class="rules" id="rules"></div>
+    </div>
   </div>
   <div class="flash" id="flash" hidden></div>
 </section>
@@ -230,8 +247,8 @@ const $ = id => document.getElementById(id);
 const screens = ["home", "ready", "play", "end"];
 const show = name => screens.forEach(s => $(s).hidden = s !== name);
 
-const CAT_ORDER = ["Legend", "Champion Unit", "Unit", "Spell", "Gear", "Battlefield", "Rune"];
-const CAT_LABEL = { "Legend": "Legends", "Champion Unit": "Champion units", "Unit": "Units", "Spell": "Spells", "Gear": "Gear", "Battlefield": "Battlefields", "Rune": "Runes" };
+const CAT_ORDER = ["Legend", "Champion Unit", "Unit", "Spell", "Gear", "Battlefield"];
+const CAT_LABEL = { "Legend": "Legends", "Champion Unit": "Champion units", "Unit": "Units", "Spell": "Spells", "Gear": "Gear", "Battlefield": "Battlefields" };
 const PROMO = "PROMO";
 
 let DB = null;            // { sets, cards }
@@ -426,6 +443,30 @@ function nextCard() {
   $("meta").textContent = bits.join(" · ");
   $("rules").textContent = current.text || "";
   $("rules").hidden = !current.text;
+  showImage(current);
+  if (pool.length) preload(pool[pool.length - 1]);
+}
+
+// Card art from Riot's CDN, resized to a phone-friendly width.
+const imgUrl = c => c.img ? c.img + (c.img.includes("?") ? "&" : "?") + "w=" + (c.wide ? 900 : 640) : null;
+const preloaded = new Map();
+function preload(c) {
+  const u = imgUrl(c);
+  if (!u || preloaded.has(u)) return;
+  const im = new Image(); im.decoding = "async"; im.src = u;
+  preloaded.set(u, im);
+  if (preloaded.size > 30) preloaded.delete(preloaded.keys().next().value);
+}
+function showImage(c) {
+  const img = $("cardImg"), u = imgUrl(c);
+  img.onload = img.onerror = null;
+  if (!u) { img.hidden = true; $("card").classList.remove("has-img"); return; }
+  img.classList.toggle("wide", !!c.wide);
+  img.alt = c.name;
+  img.onerror = () => { img.hidden = true; $("card").classList.remove("has-img"); };
+  img.src = u;
+  img.hidden = false;
+  $("card").classList.add("has-img");
 }
 
 $("startBtn").addEventListener("click", () => {
