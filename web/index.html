@@ -1,16 +1,9 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
-</head>
-<body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
 <title>Riftbound Heads-up!</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Inter:wght@400;500;600&display=swap">
 <style>
-/* Layout: one-screen game. Each phase is a full-bleed screen; play screen splits into two tap halves (pass | correct). Single dark look by choice. */
+/* Layout: one-screen game. Home is a scrolling setup sheet; play is full-bleed with two tap halves (pass | correct). Single dark look by choice. */
 :root {
   --bg: #0d1220;
   --bg-2: #151c30;
@@ -29,6 +22,7 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--body);
+  font-size: 15px;
   overflow: hidden;
   -webkit-user-select: none; user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -40,52 +34,60 @@ body {
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   display: flex; flex-direction: column;
-  background:
-    radial-gradient(120% 80% at 50% -10%, #1f2a4a 0%, transparent 60%),
-    var(--bg);
+  background: radial-gradient(120% 80% at 50% -10%, #1f2a4a 0%, transparent 60%), var(--bg);
 }
 button { font: inherit; color: inherit; cursor: pointer; }
 button:focus-visible, label:focus-within { outline: 2px solid var(--brass); outline-offset: 3px; }
 
 /* Home */
 #home { overflow-y: auto; align-items: center; }
-.home-inner { width: 100%; max-width: 30rem; display: flex; flex-direction: column; gap: 1.5rem; padding-block: 1rem 2rem; margin: auto 0; }
+.home-inner { width: 100%; max-width: 32rem; display: flex; flex-direction: column; gap: 1.4rem; padding-block: 1rem 2rem; }
 .brand { display: flex; flex-direction: column; gap: .35rem; }
-.eyebrow { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.eyebrow, .label { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.4rem, 11vw, 3.4rem); line-height: .95; margin: 0; text-wrap: balance; }
 h1 span { color: var(--brass); }
 .sub { color: var(--muted); margin: 0; line-height: 1.5; }
+.filters { display: flex; flex-direction: column; gap: 1.4rem; }
 .group { display: flex; flex-direction: column; gap: .6rem; }
-.label { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-.decks { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
-.deck { position: relative; display: flex; flex-direction: column; gap: .2rem; padding: .8rem .9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-2); cursor: pointer; }
-.deck input { position: absolute; opacity: 0; pointer-events: none; }
-.deck b { font-family: var(--display); font-size: 1.05rem; font-weight: 700; }
-.deck small { color: var(--muted); font-size: .78rem; }
-.deck:has(input:checked) { border-color: var(--brass); background: color-mix(in srgb, var(--brass) 12%, var(--bg-2)); }
-.deck:has(input:checked) b::after { content: " ✓"; color: var(--brass); }
+.group-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--brass); font-size: .82rem; font-weight: 600; }
 .seg { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.seg label { flex: 1; text-align: center; padding: .7rem 0; cursor: pointer; font-variant-numeric: tabular-nums; font-weight: 600; background: var(--bg-2); }
+.seg label { flex: 1; text-align: center; padding: .7rem .3rem; cursor: pointer; font-variant-numeric: tabular-nums; font-weight: 600; background: var(--bg-2); position: relative; }
 .seg label + label { border-left: 1px solid var(--line); }
-.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg input, .chip input { position: absolute; opacity: 0; pointer-events: none; }
 .seg label:has(input:checked) { background: var(--brass); color: #1a1406; }
+.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: .5rem; }
+.chip { position: relative; display: flex; justify-content: space-between; align-items: center; gap: .5rem; padding: .7rem .8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-2); cursor: pointer; min-width: 0; }
+.chip b { font-weight: 600; font-size: .92rem; min-width: 0; }
+.chip small { color: var(--muted); font-size: .75rem; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.chip:has(input:checked) { border-color: var(--brass); background: color-mix(in srgb, var(--brass) 13%, var(--bg-2)); }
+.chip:has(input:checked) small { color: var(--brass); }
+.chip.off { opacity: .45; }
+.matchline { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: .8rem .9rem; border-radius: 10px; background: var(--bg-2); border: 1px solid var(--line); }
+.matchline b { font-family: var(--display); font-size: 1.5rem; color: var(--brass); font-variant-numeric: tabular-nums; }
 .start { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: .04em; padding: 1rem; border: 0; border-radius: 12px; background: var(--brass); color: #1a1406; }
 .start:disabled { opacity: .4; cursor: not-allowed; }
 .how { display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none; color: var(--muted); font-size: .9rem; line-height: 1.45; }
 .how li { display: grid; grid-template-columns: 1.6rem 1fr; }
-.how li span { color: var(--brass); font-family: var(--display); font-weight: 700; }
-.fine { font-size: .75rem; color: var(--muted); opacity: .75; margin: 0; }
-.err { color: var(--pass); font-size: .85rem; margin: 0; min-height: 1.2em; }
+.how li > span { color: var(--brass); font-family: var(--display); font-weight: 700; }
+.fine { font-size: .75rem; color: var(--muted); opacity: .8; margin: 0; line-height: 1.5; }
+.fine a { color: var(--muted); }
+.err { color: var(--pass); font-size: .85rem; margin: 0; }
+.err:empty { display: none; }
+.loading { color: var(--muted); padding: 1rem 0; }
 
 /* Ready + countdown */
 #ready { align-items: center; justify-content: center; text-align: center; gap: 1.2rem; cursor: pointer; }
-#ready h2 { font-family: var(--display); font-size: clamp(1.6rem, 7vw, 2.6rem); margin: 0; text-wrap: balance; }
-#ready p { color: var(--muted); margin: 0; max-width: 28rem; line-height: 1.5; }
+#ready h2 { font-family: var(--display); font-size: clamp(1.6rem, 7vw, 2.6rem); margin: 0 0 .6rem; text-wrap: balance; }
+#ready p { color: var(--muted); margin: 0 auto; max-width: 28rem; line-height: 1.5; }
+.tiltinfo { display: flex; gap: 1.5rem; justify-content: center; margin-top: 1rem; font-weight: 600; flex-wrap: wrap; }
+.tiltinfo .up { color: var(--good); }
+.tiltinfo .down { color: var(--pass); }
 .count { font-family: var(--display); font-weight: 700; font-size: clamp(6rem, 30vmin, 14rem); color: var(--brass); line-height: 1; font-variant-numeric: tabular-nums; }
 
 /* Play */
 #play { padding: 0; }
-.hud { position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; justify-content: space-between; align-items: center;
+.hud { position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
   padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
@@ -93,29 +95,33 @@ h1 span { color: var(--brass); }
 .hud .time { font-size: 1.6rem; }
 .hud .time.low { color: var(--pass); }
 .hud .score { font-size: 1.1rem; color: var(--good); }
+.hud .mode { font-family: var(--body); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .zones { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; }
-.zone { border: 0; background: transparent; display: flex; align-items: flex-end; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
+.zone { border: 0; background: transparent; display: flex; align-items: flex-end; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
 .zone.pass { justify-content: flex-start; padding-left: max(16px, env(safe-area-inset-left, 0px)); color: var(--pass); }
 .zone.good { justify-content: flex-end; padding-right: max(16px, env(safe-area-inset-right, 0px)); color: var(--good); border-left: 1px dashed var(--line); }
-.card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem; pointer-events: none; padding: 3.5rem max(16px, env(safe-area-inset-right, 0px)) 3.5rem max(16px, env(safe-area-inset-left, 0px)); text-align: center; }
-.card .deckname { font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; color: var(--brass); }
-.card .word { font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 13vmin, 7rem); line-height: 1; text-wrap: balance; overflow-wrap: anywhere; max-width: 100%; }
+.card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem; pointer-events: none; padding: 3.5rem max(20px, env(safe-area-inset-right, 0px)) 3.5rem max(20px, env(safe-area-inset-left, 0px)); text-align: center; }
+.card .meta { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--brass); font-weight: 600; }
+.card .word { font-family: var(--display); font-weight: 700; font-size: clamp(2.4rem, 12vmin, 6.5rem); line-height: 1; text-wrap: balance; overflow-wrap: anywhere; max-width: 100%; }
+.card .subword { font-family: var(--display); font-weight: 500; font-size: clamp(1.2rem, 5vmin, 2.2rem); opacity: .85; text-wrap: balance; }
+.card .rules { color: var(--muted); font-size: clamp(.8rem, 2.6vmin, 1rem); line-height: 1.45; max-width: 40rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-top: .3rem; }
 .flash { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-size: clamp(3rem, 16vmin, 8rem); color: #0d1220; pointer-events: none; }
 .flash.good { background: var(--good); }
 .flash.pass { background: var(--pass); }
 
 /* End */
 #end { overflow-y: auto; align-items: center; }
-.end-inner { width: 100%; max-width: 30rem; display: flex; flex-direction: column; gap: 1.25rem; padding-block: 1rem 2rem; }
+.end-inner { width: 100%; max-width: 32rem; display: flex; flex-direction: column; gap: 1.25rem; padding-block: 1rem 2rem; }
 .big { font-family: var(--display); font-weight: 700; font-size: clamp(4rem, 22vw, 6rem); line-height: 1; color: var(--brass); font-variant-numeric: tabular-nums; }
 .results { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .results li { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem .9rem; background: var(--bg-2); }
 .results li + li { border-top: 1px solid var(--line); }
-.results .w { min-width: 0; overflow-wrap: anywhere; }
+.results .w { min-width: 0; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: .1rem; }
+.results .w small { color: var(--muted); font-size: .75rem; }
 .results .tag { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; flex-shrink: 0; align-self: center; }
 .results .ok .tag { color: var(--good); }
 .results .no .tag { color: var(--pass); }
-.results .no .w { color: var(--muted); }
+.results .no .w > span { color: var(--muted); }
 .row { display: flex; gap: .6rem; flex-wrap: wrap; }
 .row .start { flex: 1 1 10rem; }
 .ghost { flex: 1 1 10rem; padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: transparent; font-weight: 600; }
@@ -127,53 +133,80 @@ h1 span { color: var(--brass); }
     <div class="brand">
       <div class="eyebrow">A party game for the Rift</div>
       <h1>Riftbound <span>Heads-up!</span></h1>
-      <p class="sub">Hold the phone to your forehead. Your friends shout clues. Guess the champion, region or card term before time runs out.</p>
+      <p class="sub">Hold the phone to your forehead. Your friends describe the card. Tilt up when you get it, tilt down to pass.</p>
     </div>
 
-    <div class="group">
-      <div class="label">Decks</div>
-      <div class="decks" id="decks"></div>
-    </div>
+    <div id="loading" class="loading">Loading the card database…</div>
+    <p class="err" id="loadErr" hidden></p>
 
-    <div class="group">
-      <div class="label">Round length</div>
-      <div class="seg" role="radiogroup" aria-label="Round length">
-        <label><input type="radio" name="len" id="len30" value="30">30s</label>
-        <label><input type="radio" name="len" id="len60" value="60" checked>60s</label>
-        <label><input type="radio" name="len" id="len90" value="90">90s</label>
+    <div class="filters" id="filters" hidden>
+      <div class="group">
+        <div class="label">Card pool</div>
+        <div class="seg" role="radiogroup" aria-label="Card pool">
+          <label><input type="radio" name="pool" id="poolAll" value="all" checked>All cards</label>
+          <label><input type="radio" name="pool" id="poolSets" value="sets">By set</label>
+        </div>
+      </div>
+
+      <div class="group" id="setGroup" hidden>
+        <div class="group-head"><div class="label">Sets</div><button class="linkbtn" id="setsToggle" type="button">Clear all</button></div>
+        <div class="chips" id="setChips"></div>
+      </div>
+
+      <div class="group">
+        <div class="group-head"><div class="label">Card types</div><button class="linkbtn" id="catsToggle" type="button">Clear all</button></div>
+        <div class="chips" id="catChips"></div>
+      </div>
+
+      <div class="group">
+        <div class="label">Round length</div>
+        <div class="seg" role="radiogroup" aria-label="Round length">
+          <label><input type="radio" name="len" id="len30" value="30">30s</label>
+          <label><input type="radio" name="len" id="len60" value="60" checked>60s</label>
+          <label><input type="radio" name="len" id="len90" value="90">90s</label>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="matchline"><span>Cards in this deck</span><b id="matchCount">0</b></div>
+        <p class="err" id="err" aria-live="polite"></p>
+        <button class="start" id="startBtn">Start round</button>
       </div>
     </div>
-
-    <p class="err" id="err" aria-live="polite"></p>
-    <button class="start" id="startBtn">Start round</button>
 
     <div class="group">
       <div class="label">How to play</div>
       <ol class="how">
         <li><span>1</span>Turn the phone sideways and hold it on your forehead, screen facing your friends.</li>
-        <li><span>2</span>Tap the <b style="color:var(--good)">right half</b> when you guess it. Tap the <b style="color:var(--pass)">left half</b> to pass.</li>
-        <li><span>3</span>On a keyboard: → or Enter for correct, ← or Space to pass.</li>
+        <li><span>2</span>Tilt the phone <b style="color:var(--good)">up</b> when you guess it right (1 point). Tilt it <b style="color:var(--pass)">down</b> to pass.</li>
+        <li><span>3</span>No tilt sensor? Tap the right half for correct, the left half to pass. On a keyboard use → and ←.</li>
       </ol>
     </div>
-    <p class="fine">Unofficial fan game. Not affiliated with or endorsed by Riot Games.</p>
+    <p class="fine" id="credit">Unofficial fan game. Not affiliated with or endorsed by Riot Games. Card data from <a href="https://riftcodex.com" target="_blank" rel="noopener">Riftcodex</a>.</p>
   </div>
 </section>
 
 <section class="screen" id="ready" hidden>
   <div id="readyMsg">
     <h2>Phone on your forehead</h2>
-    <p>Screen facing out. Tap anywhere when you're ready.</p>
+    <p>Sideways, screen facing out. Tap anywhere when you're ready.</p>
+    <div class="tiltinfo"><span class="up">Tilt up = correct</span><span class="down">Tilt down = pass</span></div>
   </div>
   <div class="count" id="count" hidden>3</div>
 </section>
 
 <section class="screen" id="play" hidden>
-  <div class="hud"><span class="time" id="time">60</span><span class="score" id="score">0</span></div>
+  <div class="hud"><span class="time" id="time">60</span><span class="mode" id="ctrlMode"></span><span class="score" id="score">0</span></div>
   <div class="zones">
     <button class="zone pass" id="passZone" aria-label="Pass">← Pass</button>
     <button class="zone good" id="goodZone" aria-label="Correct">Correct →</button>
   </div>
-  <div class="card"><div class="deckname" id="deckname"></div><div class="word" id="word"></div></div>
+  <div class="card">
+    <div class="meta" id="meta"></div>
+    <div class="word" id="word"></div>
+    <div class="subword" id="subword"></div>
+    <div class="rules" id="rules"></div>
+  </div>
   <div class="flash" id="flash" hidden></div>
 </section>
 
@@ -187,110 +220,229 @@ h1 span { color: var(--brass); }
     <ul class="results" id="results"></ul>
     <div class="row">
       <button class="start" id="againBtn">Play again</button>
-      <button class="ghost" id="decksBtn">Change decks</button>
+      <button class="ghost" id="decksBtn">Change deck</button>
     </div>
   </div>
 </section>
 
 <script>
-const DECKS = {
-  champions: { name: "Champions", hint: "Jinx, Garen, Ahri…", words: [
-    "Jinx","Vi","Caitlyn","Ekko","Viktor","Jayce","Heimerdinger","Ahri","Yasuo","Yone","Lee Sin","Master Yi","Irelia","Karma","Garen","Lux","Jarvan IV","Fiora","Darius","Draven","Katarina","Swain","Sett","Teemo","Annie","Volibear","Ashe","Sejuani","Braum","Lissandra","Miss Fortune","Gangplank","Pyke","Nautilus","Thresh","Kalista","Viego","Azir","Sivir","Nasus","Renekton","Xerath","Leona","Diana","Pantheon","Aphelios","Kai'Sa","Vel'Koz","Cho'Gath","Bel'Veth","Ezreal","Blitzcrank","Zed","Shen","Akali","Kennen","Rumble","Tristana","Lulu","Veigar","Malphite","Ornn","Anivia","Twisted Fate","Nami","Milio","Qiyana","Neeko","Rengar","Kindred","Morgana","Kayle","Seraphine","Senna","Lucian","Mordekaiser","Sylas","Galio","Poppy","Wukong","Rammus","Singed","Warwick","Zeri","Tibbers"
-  ]},
-  places: { name: "Regions & Places", hint: "Demacia, Zaun…", words: [
-    "Demacia","Noxus","Ionia","Piltover","Zaun","Freljord","Shurima","Mount Targon","Bilgewater","Shadow Isles","Ixtal","Bandle City","The Void","Runeterra","Summoner's Rift","Howling Abyss","The Undercity","The Sun Disc","Fountain","Top Lane","Mid Lane","Bot Lane","The Jungle","River","Nexus","Inhibitor","Turret","Baron Pit","Dragon Pit","Blue Side","Red Side"
-  ]},
-  terms: { name: "Card Game Terms", hint: "Rune, Battlefield…", words: [
-    "Rune","Battlefield","Legend","Champion unit","Signature card","Spell","Gear","Unit","Deck","Mulligan","Draw a card","Discard","Exhaust","Ready","Might","Energy","Power","Score a point","Conquer","Hold","Showdown","Combat","Attacker","Defender","Tank","Shield","Deathknell","Hidden","Accelerate","Reaction","Recycle","Buff","Token","Trash","Base","Starter deck","Booster pack","Foil card","Alternate art","Card sleeves","Playmat","Top deck","Topdecking","Tournament","Fury","Calm","Mind","Body","Chaos","Order"
-  ]},
-  rift: { name: "Monsters & Items", hint: "Baron, Blue Buff…", words: [
-    "Baron Nashor","Elder Dragon","Rift Herald","Void Grubs","Blue Buff","Red Buff","Scuttle Crab","Gromp","Krugs","Raptors","Murk Wolves","Minion wave","Cannon minion","Super minion","Poro","Infinity Edge","Rabadon's Deathcap","Blade of the Ruined King","Zhonya's Hourglass","Trinity Force","Health potion","Control ward","Flash","Ignite","Teleport","Smite","Recall","Pentakill","First Blood","Ace","Gank","Backdoor","Hextech","Shimmer","Chemtech","Petricite","Golden Spatula","Teemo mushroom"
-  ]}
-};
-
 const $ = id => document.getElementById(id);
-const screens = ["home","ready","play","end"];
-function show(name){ screens.forEach(s => $(s).hidden = s !== name); }
+const screens = ["home", "ready", "play", "end"];
+const show = name => screens.forEach(s => $(s).hidden = s !== name);
 
-// Deck chips
-const deckWrap = $("decks");
-Object.entries(DECKS).forEach(([key, d], i) => {
-  const lab = document.createElement("label");
-  lab.className = "deck";
-  const inp = document.createElement("input");
-  inp.type = "checkbox"; inp.id = "deck-" + key; inp.value = key; inp.checked = i < 2;
-  const b = document.createElement("b"); b.textContent = d.name;
-  const sm = document.createElement("small"); sm.textContent = d.words.length + " cards · " + d.hint;
-  lab.append(inp, b, sm);
-  deckWrap.append(lab);
-});
-function prefsSave(){ try { localStorage.setItem("rhu-prefs", JSON.stringify({ decks: chosenDecks(), len: roundLen() })); } catch(e){} }
-function prefsLoad(){
+const CAT_ORDER = ["Legend", "Champion Unit", "Unit", "Spell", "Gear", "Battlefield", "Rune"];
+const CAT_LABEL = { "Legend": "Legends", "Champion Unit": "Champion units", "Unit": "Units", "Spell": "Spells", "Gear": "Gear", "Battlefield": "Battlefields", "Rune": "Runes" };
+const PROMO = "PROMO";
+
+let DB = null;            // { sets, cards }
+const setName = {};       // set id -> display name
+const promoSets = new Set();
+
+// ---------- Data ----------
+async function loadCards() {
   try {
-    const p = JSON.parse(localStorage.getItem("rhu-prefs") || "null");
-    if (!p) return;
-    if (Array.isArray(p.decks) && p.decks.length) document.querySelectorAll("#decks input").forEach(i => i.checked = p.decks.includes(i.value));
-    const r = document.querySelector('input[name="len"][value="' + Number(p.len) + '"]'); if (r) r.checked = true;
-  } catch(e){}
+    const res = await fetch("cards.json", { cache: "no-cache" });
+    if (!res.ok) throw new Error(res.status);
+    DB = await res.json();
+  } catch (e) {
+    $("loading").hidden = true;
+    $("loadErr").hidden = false;
+    $("loadErr").textContent = "Couldn't load the card list (cards.json). If you opened this file straight from your computer, run it through a local web server instead.";
+    return;
+  }
+  DB.sets.forEach(s => { setName[s.id] = s.promo ? "Promos" : s.name; if (s.promo) promoSets.add(s.id); });
+  buildFilters();
+  prefsLoad();
+  syncFilters();
+  $("loading").hidden = true;
+  $("filters").hidden = false;
+  if (DB.fetched) $("credit").append(" Updated " + DB.fetched + ".");
 }
-const chosenDecks = () => [...document.querySelectorAll("#decks input:checked")].map(i => i.value);
-const roundLen = () => Number(document.querySelector('input[name="len"]:checked').value);
-prefsLoad();
 
-// Audio (starts only after a tap)
+const cardSetKey = c => (promoSets.has(c.set) ? PROMO : c.set);
+
+function makeChip(wrap, id, value, label) {
+  const lab = document.createElement("label");
+  lab.className = "chip";
+  const inp = document.createElement("input");
+  inp.type = "checkbox"; inp.id = id; inp.value = value; inp.checked = true;
+  const b = document.createElement("b"); b.textContent = label;
+  const sm = document.createElement("small");
+  lab.append(inp, b, sm);
+  wrap.append(lab);
+  inp.addEventListener("change", syncFilters);
+  return { lab, inp, sm };
+}
+
+const setChips = {}, catChips = {};
+function buildFilters() {
+  DB.sets.filter(s => !s.promo).forEach(s => setChips[s.id] = makeChip($("setChips"), "set-" + s.id, s.id, s.name));
+  if (promoSets.size) setChips[PROMO] = makeChip($("setChips"), "set-promo", PROMO, "Promos");
+  const cats = CAT_ORDER.filter(c => DB.cards.some(x => x.cat === c));
+  DB.cards.forEach(x => { if (!cats.includes(x.cat)) cats.push(x.cat); });
+  cats.forEach(c => catChips[c] = makeChip($("catChips"), "cat-" + c.replace(/\W+/g, "-"), c, CAT_LABEL[c] || c));
+  document.querySelectorAll('input[name="pool"]').forEach(i => i.addEventListener("change", syncFilters));
+  $("setsToggle").addEventListener("click", () => toggleAll(setChips));
+  $("catsToggle").addEventListener("click", () => toggleAll(catChips));
+}
+function toggleAll(chips) {
+  const anyOff = Object.values(chips).some(c => !c.inp.checked);
+  Object.values(chips).forEach(c => c.inp.checked = anyOff);
+  syncFilters();
+}
+
+const poolMode = () => document.querySelector('input[name="pool"]:checked').value;
+const chosen = chips => Object.entries(chips).filter(([, c]) => c.inp.checked).map(([k]) => k);
+const roundLen = () => Number(document.querySelector('input[name="len"]:checked').value);
+
+function matchingCards() {
+  const cats = new Set(chosen(catChips));
+  const sets = poolMode() === "all" ? null : new Set(chosen(setChips));
+  return DB.cards.filter(c => cats.has(c.cat) && (!sets || sets.has(cardSetKey(c))));
+}
+
+function syncFilters() {
+  const bySets = poolMode() === "sets";
+  $("setGroup").hidden = !bySets;
+  const cats = new Set(chosen(catChips));
+  const sets = bySets ? new Set(chosen(setChips)) : null;
+  // Each chip's count reflects the other filter.
+  Object.entries(setChips).forEach(([k, ch]) => {
+    const n = DB.cards.filter(c => cardSetKey(c) === k && cats.has(c.cat)).length;
+    ch.sm.textContent = n;
+    ch.lab.classList.toggle("off", n === 0);
+  });
+  Object.entries(catChips).forEach(([k, ch]) => {
+    const n = DB.cards.filter(c => c.cat === k && (!sets || sets.has(cardSetKey(c)))).length;
+    ch.sm.textContent = n;
+    ch.lab.classList.toggle("off", n === 0);
+  });
+  $("setsToggle").textContent = Object.values(setChips).some(c => !c.inp.checked) ? "Select all" : "Clear all";
+  $("catsToggle").textContent = Object.values(catChips).some(c => !c.inp.checked) ? "Select all" : "Clear all";
+  const n = matchingCards().length;
+  $("matchCount").textContent = n;
+  $("startBtn").disabled = n < 1;
+  $("err").textContent = n >= 1 ? "" : (!chosen(catChips).length ? "Pick at least one card type." : bySets && !chosen(setChips).length ? "Pick at least one set." : "No cards match. Try another set or card type.");
+  prefsSave();
+}
+
+function prefsSave() {
+  try { localStorage.setItem("rhu-prefs-v2", JSON.stringify({ pool: poolMode(), sets: chosen(setChips), cats: chosen(catChips), len: roundLen() })); } catch (e) {}
+}
+function prefsLoad() {
+  try {
+    const p = JSON.parse(localStorage.getItem("rhu-prefs-v2") || "null");
+    if (!p) return;
+    const pool = document.querySelector('input[name="pool"][value="' + (p.pool === "sets" ? "sets" : "all") + '"]'); if (pool) pool.checked = true;
+    if (Array.isArray(p.sets) && p.sets.length) Object.entries(setChips).forEach(([k, c]) => c.inp.checked = p.sets.includes(k));
+    if (Array.isArray(p.cats) && p.cats.length) Object.entries(catChips).forEach(([k, c]) => c.inp.checked = p.cats.includes(k));
+    const r = document.querySelector('input[name="len"][value="' + Number(p.len) + '"]'); if (r) r.checked = true;
+  } catch (e) {}
+}
+document.querySelectorAll('input[name="len"]').forEach(i => i.addEventListener("change", () => DB && prefsSave()));
+
+// ---------- Sound, vibration, wake lock ----------
 let actx = null;
-function beep(freq, dur = .12, type = "sine", vol = .18){
+function beep(freq, dur = .12, type = "sine", vol = .18) {
   try {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === "suspended") actx.resume();
     const o = actx.createOscillator(), g = actx.createGain();
     o.type = type; o.frequency.value = freq;
     g.gain.setValueAtTime(vol, actx.currentTime);
     g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + dur);
     o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime + dur);
-  } catch(e){}
+  } catch (e) {}
 }
-function buzz(ms){ try { navigator.vibrate && navigator.vibrate(ms); } catch(e){} }
-
+const buzz = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
 let wake = null;
-async function keepAwake(){ try { wake = await navigator.wakeLock.request("screen"); } catch(e){ wake = null; } }
-function releaseAwake(){ try { wake && wake.release(); } catch(e){} wake = null; }
+async function keepAwake() { try { wake = await navigator.wakeLock.request("screen"); } catch (e) { wake = null; } }
+function releaseAwake() { try { wake && wake.release(); } catch (e) {} wake = null; }
 
-// Game state
-const seen = new Set();
-let pool = [], current = null, results = [], endAt = 0, tick = null, locked = false, lastSec = null, phase = "home";
+// ---------- Tilt ----------
+// How much the screen faces up or down: gz = cos(beta)·cos(gamma).
+// +1 = screen facing the ceiling, 0 = upright on your forehead, -1 = facing the floor.
+// Same in portrait and landscape. Tilt up (screen toward ceiling) = correct; tilt down = pass.
+const TILT_TRIGGER = 0.5;   // about 30° past where the round started
+const TILT_RESET = 0.25;    // come back near upright before the next answer counts
+let tiltState = "off";      // off | waiting | armed | cooling
+let tiltSeen = false, tiltBase = 0, lastGz = null;
 
-function shuffle(a){ for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-function buildPool(){
-  const all = [];
-  chosenDecks().forEach(k => DECKS[k].words.forEach(w => all.push({ w, deck: DECKS[k].name })));
-  let fresh = all.filter(c => !seen.has(c.w));
-  if (fresh.length < 10) { all.forEach(c => seen.delete(c.w)); fresh = all; }
-  pool = shuffle(fresh);
+function enableTilt() {
+  // iOS asks for permission, and only from a tap.
+  try {
+    if (typeof DeviceOrientationEvent === "undefined") return;
+    if (typeof DeviceOrientationEvent.requestPermission === "function") {
+      DeviceOrientationEvent.requestPermission()
+        .then(r => { if (r === "granted") window.addEventListener("deviceorientation", onOrient); })
+        .catch(() => {});
+    } else {
+      window.addEventListener("deviceorientation", onOrient);
+    }
+  } catch (e) {}
 }
-function nextCard(){
+function onOrient(e) {
+  if (e.beta == null || e.gamma == null) return;
+  tiltSeen = true;
+  const rad = Math.PI / 180;
+  const gz = Math.cos(e.beta * rad) * Math.cos(e.gamma * rad);
+  lastGz = gz;
+  if (phase !== "play") return;
+  const d = gz - tiltBase;
+  if (tiltState === "armed") {
+    if (d > TILT_TRIGGER) { tiltState = "cooling"; answer(true); }
+    else if (d < -TILT_TRIGGER) { tiltState = "cooling"; answer(false); }
+  } else if (tiltState === "cooling" || tiltState === "waiting") {
+    if (Math.abs(d) < TILT_RESET) tiltState = "armed";
+  }
+}
+
+// ---------- Game ----------
+const seen = new Set();
+let pool = [], current = null, results = [], endAt = 0, tick = null, locked = false, lastSec = null, phase = "home", counting = false;
+
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const cardKey = c => c.set + "|" + c.name;
+function buildPool() {
+  const all = matchingCards();
+  let fresh = all.filter(c => !seen.has(cardKey(c)));
+  if (fresh.length < Math.min(10, all.length)) { all.forEach(c => seen.delete(cardKey(c))); fresh = all; }
+  pool = shuffle(fresh.slice());
+}
+function splitName(name) {
+  const i = name.indexOf(" - ");
+  return i > 0 ? [name.slice(0, i), name.slice(i + 3)] : [name, ""];
+}
+function nextCard() {
   if (!pool.length) buildPool();
-  current = pool.pop(); seen.add(current.w);
-  $("word").textContent = current.w;
-  $("deckname").textContent = current.deck;
+  current = pool.pop(); seen.add(cardKey(current));
+  const [main, sub] = splitName(current.name);
+  $("word").textContent = main;
+  $("subword").textContent = sub;
+  $("subword").hidden = !sub;
+  const bits = [current.cat];
+  if (current.domain && current.domain.length) bits.push(current.domain.join(" / "));
+  bits.push(setName[current.set] || current.set);
+  $("meta").textContent = bits.join(" · ");
+  $("rules").textContent = current.text || "";
+  $("rules").hidden = !current.text;
 }
 
 $("startBtn").addEventListener("click", () => {
-  if (!chosenDecks().length) { $("err").textContent = "Pick at least one deck to play."; return; }
-  $("err").textContent = "";
-  prefsSave(); beep(1, .01, "sine", .0001);
-  try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); } catch(e){}
+  if (!DB || !matchingCards().length) return;
+  enableTilt();                       // must run inside the tap for iOS
+  beep(1, .01, "sine", .0001);        // unlock audio
+  try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); } catch (e) {}
   goReady();
 });
-document.querySelectorAll("#decks input").forEach(i => i.addEventListener("change", () => { if (chosenDecks().length) $("err").textContent = ""; }));
 
-function goReady(){
+function goReady() {
   phase = "ready"; show("ready");
   $("readyMsg").hidden = false; $("count").hidden = true;
   keepAwake();
 }
 $("ready").addEventListener("click", startCountdown);
-let counting = false;
-function startCountdown(){
+function startCountdown() {
   if (phase !== "ready" || counting) return;
   counting = true;
   $("readyMsg").hidden = true; $("count").hidden = false;
@@ -302,15 +454,19 @@ function startCountdown(){
   }, 900);
 }
 
-function startRound(){
+function startRound() {
   phase = "play"; results = []; locked = false; lastSec = null;
+  // Calibrate to however the phone sits on the forehead right now.
+  tiltBase = tiltSeen && lastGz != null && Math.abs(lastGz) < 0.6 ? lastGz : 0;
+  tiltState = tiltSeen ? "waiting" : "off";
+  $("ctrlMode").textContent = tiltSeen ? "Tilt up ✓ · down ✗" : "Tap to answer";
   buildPool(); nextCard();
   $("score").textContent = "0";
   endAt = performance.now() + roundLen() * 1000;
   show("play"); renderTime();
   tick = setInterval(renderTime, 100);
 }
-function renderTime(){
+function renderTime() {
   const left = Math.max(0, Math.ceil((endAt - performance.now()) / 1000));
   $("time").textContent = left;
   $("time").classList.toggle("low", left <= 5);
@@ -318,49 +474,52 @@ function renderTime(){
   lastSec = left;
   if (left <= 0) finish();
 }
-function answer(ok){
+function answer(ok) {
   if (phase !== "play" || locked) return;
   locked = true;
-  results.push({ w: current.w, ok });
+  results.push({ c: current, ok });
   $("score").textContent = results.filter(r => r.ok).length;
   const f = $("flash");
   f.className = "flash " + (ok ? "good" : "pass");
-  f.textContent = ok ? "Correct!" : "Pass";
+  f.textContent = ok ? "Correct! +1" : "Pass";
   f.hidden = false;
   if (ok) { beep(784, .1); setTimeout(() => beep(1046, .16), 90); buzz(40); } else { beep(220, .22, "triangle"); buzz([20, 40, 20]); }
-  setTimeout(() => { f.hidden = true; if (phase === "play") { nextCard(); locked = false; } }, 650);
+  setTimeout(() => { f.hidden = true; if (phase === "play") { nextCard(); locked = false; } }, 700);
 }
 $("goodZone").addEventListener("click", () => answer(true));
 $("passZone").addEventListener("click", () => answer(false));
 document.addEventListener("keydown", e => {
   if (phase === "play") {
-    if (e.key === "ArrowRight" || e.key === "Enter") { e.preventDefault(); answer(true); }
-    else if (e.key === "ArrowLeft" || e.key === " ") { e.preventDefault(); answer(false); }
+    if (e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "Enter") { e.preventDefault(); answer(true); }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowDown" || e.key === " ") { e.preventDefault(); answer(false); }
   } else if (phase === "ready" && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); startCountdown(); }
 });
 
-function finish(){
+function finish() {
   if (phase !== "play") return;
-  clearInterval(tick); phase = "end";
-  if (current && !locked) results.push({ w: current.w, ok: false, timeout: true });
+  clearInterval(tick); phase = "end"; tiltState = "off";
+  if (current && !locked) results.push({ c: current, ok: false, timeout: true });
   beep(330, .2, "sawtooth", .1); setTimeout(() => beep(247, .35, "sawtooth", .1), 180); buzz(200);
   releaseAwake();
   const got = results.filter(r => r.ok).length;
   $("final").textContent = got;
-  $("finalSub").textContent = got === 1 ? "1 correct guess. Can your friends beat it?" : got + " correct guesses. Can your friends beat it?";
+  $("finalSub").textContent = (got === 1 ? "1 point" : got + " points") + ". Pass the phone and see who can beat it.";
   const ul = $("results"); ul.replaceChildren();
   results.forEach(r => {
     const li = document.createElement("li"); li.className = r.ok ? "ok" : "no";
-    const w = document.createElement("span"); w.className = "w"; w.textContent = r.w;
-    const t = document.createElement("span"); t.className = "tag"; t.textContent = r.ok ? "Got it" : (r.timeout ? "Time" : "Passed");
+    const w = document.createElement("span"); w.className = "w";
+    const nm = document.createElement("span"); nm.textContent = r.c.name;
+    const sm = document.createElement("small"); sm.textContent = r.c.cat + " · " + (setName[r.c.set] || r.c.set);
+    w.append(nm, sm);
+    const t = document.createElement("span"); t.className = "tag"; t.textContent = r.ok ? "+1" : (r.timeout ? "Time" : "Passed");
     li.append(w, t); ul.append(li);
   });
   show("end");
 }
-$("againBtn").addEventListener("click", goReady);
-$("decksBtn").addEventListener("click", () => { phase = "home"; show("home"); try { document.fullscreenElement && document.exitFullscreen(); } catch(e){} });
+$("againBtn").addEventListener("click", () => { enableTilt(); goReady(); });
+$("decksBtn").addEventListener("click", () => { phase = "home"; show("home"); try { document.fullscreenElement && document.exitFullscreen(); } catch (e) {} });
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && (phase === "play" || phase === "ready")) keepAwake(); });
-</script>
 
-</body>
-</html>
+loadCards();
+</script>
+</body></html>
