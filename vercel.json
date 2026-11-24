@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo \"No install needed: the game is static files in web/\"",
+  "buildCommand": "echo \"No build needed: the game is static files in web/\"",
+  "outputDirectory": "web",
+  "headers": [
+    {
+      "source": "/cards.json",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    }
+  ]
+}
