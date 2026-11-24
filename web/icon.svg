@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#26335a"/>
+      <stop offset="1" stop-color="#0d1220"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4d08a"/>
+      <stop offset="1" stop-color="#d9a441"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.38" r="0.55">
+      <stop offset="0" stop-color="#e2b45a" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#e2b45a" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="tile"><rect width="512" height="512" rx="112"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#tile)">
+    <rect width="512" height="512" fill="url(#bg)"/>
+    <rect width="512" height="512" fill="url(#glow)"/>
+
+    <!-- player -->
+    <g>
+      <!-- arms -->
+      <path d="M 92 540 C 92 430, 96 360, 122 300" fill="none" stroke="#3b6fd8" stroke-width="64" stroke-linecap="round"/>
+      <path d="M 420 540 C 420 430, 416 360, 390 300" fill="none" stroke="#3b6fd8" stroke-width="64" stroke-linecap="round"/>
+      <!-- head -->
+      <circle cx="256" cy="446" r="112" fill="#f0c39b"/>
+      <!-- hair -->
+      <path d="M 146 428 C 146 352, 196 330, 256 330 C 316 330, 366 352, 366 428 C 340 392, 300 380, 256 384 C 212 380, 172 392, 146 428 Z" fill="#2b2140"/>
+      <!-- happy closed eyes -->
+      <path d="M 200 436 Q 216 418 232 436" fill="none" stroke="#2b2140" stroke-width="11" stroke-linecap="round"/>
+      <path d="M 280 436 Q 296 418 312 436" fill="none" stroke="#2b2140" stroke-width="11" stroke-linecap="round"/>
+      <!-- cheeks -->
+      <circle cx="194" cy="466" r="14" fill="#e98d7a" opacity=".55"/>
+      <circle cx="318" cy="466" r="14" fill="#e98d7a" opacity=".55"/>
+      <!-- smile -->
+      <path d="M 222 478 Q 256 506 290 478" fill="none" stroke="#2b2140" stroke-width="10" stroke-linecap="round"/>
+    </g>
+
+    <!-- the card held overhead -->
+    <g transform="rotate(-4 256 180)">
+      <rect x="44" y="58" width="424" height="244" rx="34" fill="#0d1220" opacity=".35" transform="translate(0 10)"/>
+      <rect x="44" y="58" width="424" height="244" rx="34" fill="url(#card)"/>
+      <rect x="60" y="74" width="392" height="212" rx="22" fill="none" stroke="#0d1220" stroke-opacity=".28" stroke-width="5"/>
+      <text x="256" y="152" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-weight="900" font-size="60" letter-spacing="2" fill="#0d1220" textLength="300" lengthAdjust="spacingAndGlyphs">RIFTBOUND</text>
+      <text x="256" y="250" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-weight="900" font-size="88" fill="#0d1220" textLength="350" lengthAdjust="spacingAndGlyphs">Heads up!</text>
+    </g>
+
+    <!-- hands gripping the card -->
+    <circle cx="118" cy="296" r="36" fill="#f0c39b"/>
+    <circle cx="394" cy="296" r="36" fill="#f0c39b"/>
+    <path d="M 100 284 L 136 284 M 100 298 L 136 298" stroke="#d9a07a" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 376 284 L 412 284 M 376 298 L 412 298" stroke="#d9a07a" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>
