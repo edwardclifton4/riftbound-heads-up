@@ -38,6 +38,7 @@ function category(c) {
   const type = c.classification?.type || "Other";
   const sup = c.classification?.supertype || "";
   if (type === "Unit" && /champion/i.test(sup)) return "Champion Unit";
+  if (type === "Spell" && /signature/i.test(sup)) return "Signature Spell";
   return type;
 }
 

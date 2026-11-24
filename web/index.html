@@ -13,6 +13,12 @@
   --brass: #e2b45a;
   --good: #35c98a;
   --pass: #ef7b45;
+  --dom-red: #ff6b5e;
+  --dom-green: #4fd18b;
+  --dom-blue: #5aa9ff;
+  --dom-orange: #ff9f45;
+  --dom-purple: #b98cff;
+  --dom-yellow: #ffd84d;
   --display: "Chakra Petch", "Trebuchet MS", system-ui, sans-serif;
   --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: dark;
@@ -115,6 +121,8 @@ h1 span { color: var(--brass); }
   .card.has-img .word { font-size: clamp(2rem, 9vmin, 5rem); }
 }
 .card.has-img .rules { display: none; }
+.dom-red { color: var(--dom-red); } .dom-green { color: var(--dom-green); } .dom-blue { color: var(--dom-blue); }
+.dom-orange { color: var(--dom-orange); } .dom-purple { color: var(--dom-purple); } .dom-yellow { color: var(--dom-yellow); }
 .card .meta { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--brass); font-weight: 600; }
 .card .word { font-family: var(--display); font-weight: 700; font-size: clamp(2.4rem, 12vmin, 6.5rem); line-height: 1; text-wrap: balance; overflow-wrap: anywhere; max-width: 100%; }
 .card .subword { font-family: var(--display); font-weight: 500; font-size: clamp(1.2rem, 5vmin, 2.2rem); opacity: .85; text-wrap: balance; }
@@ -247,8 +255,14 @@ const $ = id => document.getElementById(id);
 const screens = ["home", "ready", "play", "end"];
 const show = name => screens.forEach(s => $(s).hidden = s !== name);
 
-const CAT_ORDER = ["Legend", "Champion Unit", "Unit", "Spell", "Gear", "Battlefield"];
-const CAT_LABEL = { "Legend": "Legends", "Champion Unit": "Champion Unit", "Unit": "Units", "Spell": "Spells", "Gear": "Gear", "Battlefield": "Battlefields" };
+const CAT_ORDER = ["Legend", "Champion Unit", "Unit", "Spell", "Signature Spell", "Gear", "Battlefield"];
+const CAT_LABEL = { "Legend": "Legends", "Champion Unit": "Champion Unit", "Unit": "Units", "Spell": "Spells", "Signature Spell": "Signature Spell", "Gear": "Gear", "Battlefield": "Battlefields" };
+// Riftbound domains and their card colors.
+const DOMAIN_COLOR = { Fury: "red", Calm: "green", Mind: "blue", Body: "orange", Chaos: "purple", Order: "yellow" };
+const domainList = c => (c.domain || []).filter(Boolean);
+const domainWord = d => DOMAIN_COLOR[d] ? d + " (" + DOMAIN_COLOR[d] + ")" : d;
+// "Calm (green) Unit", "Fury (red) / Order (yellow) Legend", "Colorless Battlefield"
+const typeLine = c => { const d = domainList(c).map(domainWord).join(" / "); return (d ? d + " " : "") + c.cat; };
 const PROMO = "PROMO";
 
 let DB = null;            // { sets, cards }
@@ -344,7 +358,7 @@ function syncFilters() {
 }
 
 function prefsSave() {
-  try { localStorage.setItem("rhu-prefs-v2", JSON.stringify({ pool: poolMode(), sets: chosen(setChips), cats: chosen(catChips), len: roundLen() })); } catch (e) {}
+  try { localStorage.setItem("rhu-prefs-v2", JSON.stringify({ pool: poolMode(), sets: chosen(setChips), cats: chosen(catChips), allCats: Object.keys(catChips), len: roundLen() })); } catch (e) {}
 }
 function prefsLoad() {
   try {
@@ -352,7 +366,9 @@ function prefsLoad() {
     if (!p) return;
     const pool = document.querySelector('input[name="pool"][value="' + (p.pool === "sets" ? "sets" : "all") + '"]'); if (pool) pool.checked = true;
     if (Array.isArray(p.sets) && p.sets.length) Object.entries(setChips).forEach(([k, c]) => c.inp.checked = p.sets.includes(k));
-    if (Array.isArray(p.cats) && p.cats.length) Object.entries(catChips).forEach(([k, c]) => c.inp.checked = p.cats.includes(k));
+    // Card types added since the prefs were saved start switched on.
+    const known = Array.isArray(p.allCats) ? p.allCats : ["Legend", "Champion Unit", "Unit", "Spell", "Gear", "Battlefield"];
+    if (Array.isArray(p.cats) && p.cats.length) Object.entries(catChips).forEach(([k, c]) => c.inp.checked = p.cats.includes(k) || !known.includes(k));
     const r = document.querySelector('input[name="len"][value="' + Number(p.len) + '"]'); if (r) r.checked = true;
   } catch (e) {}
 }
@@ -437,10 +453,16 @@ function nextCard() {
   $("word").textContent = main;
   $("subword").textContent = sub;
   $("subword").hidden = !sub;
-  const bits = [current.cat];
-  if (current.domain && current.domain.length) bits.push(current.domain.join(" / "));
-  bits.push(setName[current.set] || current.set);
-  $("meta").textContent = bits.join(" · ");
+  // Type line with each domain tinted its card color, then the set.
+  const meta = $("meta"); meta.replaceChildren();
+  domainList(current).forEach((d, i) => {
+    if (i) meta.append(" / ");
+    const s = document.createElement("span");
+    s.textContent = domainWord(d);
+    if (DOMAIN_COLOR[d]) s.className = "dom-" + DOMAIN_COLOR[d];
+    meta.append(s);
+  });
+  meta.append((domainList(current).length ? " " : "") + current.cat + " · " + (setName[current.set] || current.set));
   $("rules").textContent = current.text || "";
   $("rules").hidden = !current.text;
   showImage(current);
@@ -550,7 +572,7 @@ function finish() {
     const li = document.createElement("li"); li.className = r.ok ? "ok" : "no";
     const w = document.createElement("span"); w.className = "w";
     const nm = document.createElement("span"); nm.textContent = r.c.name;
-    const sm = document.createElement("small"); sm.textContent = r.c.cat + " · " + (setName[r.c.set] || r.c.set);
+    const sm = document.createElement("small"); sm.textContent = typeLine(r.c) + " · " + (setName[r.c.set] || r.c.set);
     w.append(nm, sm);
     const t = document.createElement("span"); t.className = "tag"; t.textContent = r.ok ? "+1" : (r.timeout ? "Time" : "Passed");
     li.append(w, t); ul.append(li);
