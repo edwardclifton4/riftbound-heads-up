@@ -277,7 +277,8 @@ const CAT_ORDER = ["Legend", "Champion Unit", "Unit", "Signature Unit", "Spell",
 const CAT_LABEL = { "Legend": "Legends", "Champion Unit": "Champion Unit", "Unit": "Units", "Signature Unit": "Signature Unit", "Spell": "Spells", "Signature Spell": "Signature Spell", "Gear": "Gear", "Signature Gear": "Signature Gear", "Battlefield": "Battlefields" };
 // Riftbound domains and their card colors.
 const DOMAIN_COLOR = { Fury: "red", Calm: "green", Mind: "blue", Body: "orange", Chaos: "purple", Order: "yellow" };
-const domainList = c => (c.domain || []).filter(Boolean);
+// Battlefields have no color, so their type line is just "Battlefield".
+const domainList = c => c.cat === "Battlefield" ? [] : (c.domain || []).filter(Boolean);
 const domainWord = d => DOMAIN_COLOR[d] ? d + " (" + DOMAIN_COLOR[d] + ")" : d;
 // "Calm (green) Unit", "Fury (red) / Order (yellow) Legend", "Colorless Battlefield"
 const typeLine = c => { const d = domainList(c).map(domainWord).join(" / "); return (d ? d + " " : "") + c.cat; };
