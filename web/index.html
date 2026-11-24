@@ -109,24 +109,38 @@ h1 span { color: var(--brass); }
 .zone { border: 0; background: transparent; display: flex; align-items: flex-end; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
 .zone.pass { justify-content: flex-start; padding-left: max(16px, env(safe-area-inset-left, 0px)); color: var(--pass); }
 .zone.good { justify-content: flex-end; padding-right: max(16px, env(safe-area-inset-right, 0px)); color: var(--good); border-left: 1px dashed var(--line); }
-.card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; pointer-events: none; padding: 3.2rem max(20px, env(safe-area-inset-right, 0px)) 3.2rem max(20px, env(safe-area-inset-left, 0px)); text-align: center; }
-.card .info { display: flex; flex-direction: column; align-items: center; gap: .5rem; min-width: 0; max-width: 100%; }
-.cardimg { display: block; max-width: 80vw; max-height: 46vh; width: auto; height: auto; object-fit: contain; border-radius: 3.5% / 2.5%; box-shadow: 0 10px 40px rgba(0,0,0,.55), 0 0 0 1px var(--line); background: var(--bg-2); }
-.cardimg.wide { max-height: 34vh; }
+/* Card on the left, as big as the screen allows; every detail on the right (stacked in portrait). */
+.card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5vmin; pointer-events: none;
+  padding: calc(env(safe-area-inset-top, 0px) + 2.9rem) max(14px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 2.4rem) max(14px, env(safe-area-inset-left, 0px)); }
+.cardimg { display: block; flex: 0 0 auto; max-width: 92vw; max-height: 52vh; width: auto; height: auto; object-fit: contain; border-radius: 3.5% / 2.5%; box-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 0 1px var(--line); background: var(--bg-2); }
+.cardimg.wide { max-height: 40vh; }
+.card .info { box-sizing: border-box; flex: 1 1 0; min-height: 0; width: 100%; max-width: 40rem; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; gap: .45em; font-size: 16px; text-align: left; }
+/* Auto margins center the details while still letting overflow be measured from the top. */
+.card .info > .meta { margin-top: auto; }
+.card .info > .foot { margin-bottom: auto; }
 @media (orientation: landscape) {
-  .card { flex-direction: row; gap: 5vmin; }
-  .card .info { flex: 1 1 0; max-width: 46vw; }
-  .cardimg { max-height: calc(100vh - 7.5rem); max-width: 42vw; }
-  .cardimg.wide { max-width: 52vw; max-height: calc(100vh - 9rem); }
-  .card.has-img .word { font-size: clamp(2rem, 9vmin, 5rem); }
+  /* Card fills the full height; timer, score and tap hints move beside it. */
+  .card { flex-direction: row; align-items: stretch; padding-top: calc(env(safe-area-inset-top, 0px) + 8px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); }
+  .cardimg { align-self: center; max-height: 100%; max-width: 52vw; }
+  .cardimg.wide { max-width: 58vw; max-height: 100%; }
+  .card .info { height: 100%; max-width: none; padding-block: 2.6rem 2rem; }
+  #play .hud { left: var(--card-right, 0px); }
+  #play .zone.pass { padding-left: calc(var(--card-right, 0px) + 6px); }
 }
-.card.has-img .rules { display: none; }
+.card .meta { font-size: .78em; letter-spacing: .1em; text-transform: uppercase; color: var(--fg); font-weight: 700; }
+.card .word { font-family: var(--display); font-weight: 700; font-size: 2.3em; line-height: 1; text-wrap: balance; overflow-wrap: anywhere; }
+.card .subword { font-family: var(--display); font-weight: 500; font-size: 1.3em; line-height: 1.1; color: var(--brass); text-wrap: balance; }
+.card .stats { display: flex; flex-wrap: wrap; gap: .35em; }
+.card .stat { display: inline-flex; align-items: baseline; gap: .35em; padding: .25em .6em; border: 1px solid var(--line); border-radius: 999px; background: var(--bg-2); font-size: .9em; }
+.card .stat b { font-family: var(--display); font-size: 1.25em; font-variant-numeric: tabular-nums; color: var(--fg); }
+.card .stat span { color: var(--muted); font-size: .8em; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+.card .tags { display: flex; flex-wrap: wrap; gap: .3em; }
+.card .tag { font-size: .78em; padding: .15em .55em; border-radius: 4px; background: color-mix(in srgb, var(--brass) 16%, var(--bg-2)); color: var(--brass); font-weight: 600; }
+.card .rules { font-size: 1em; line-height: 1.4; color: var(--fg); white-space: pre-line; }
+.card .flavour { font-size: .85em; line-height: 1.4; color: var(--muted); font-style: italic; }
+.card .foot { font-size: .72em; color: var(--muted); letter-spacing: .02em; }
 .dom-red { color: var(--dom-red); } .dom-green { color: var(--dom-green); } .dom-blue { color: var(--dom-blue); }
 .dom-orange { color: var(--dom-orange); } .dom-purple { color: var(--dom-purple); } .dom-yellow { color: var(--dom-yellow); }
-.card .meta { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--brass); font-weight: 600; }
-.card .word { font-family: var(--display); font-weight: 700; font-size: clamp(2.4rem, 12vmin, 6.5rem); line-height: 1; text-wrap: balance; overflow-wrap: anywhere; max-width: 100%; }
-.card .subword { font-family: var(--display); font-weight: 500; font-size: clamp(1.2rem, 5vmin, 2.2rem); opacity: .85; text-wrap: balance; }
-.card .rules { color: var(--muted); font-size: clamp(.8rem, 2.6vmin, 1rem); line-height: 1.45; max-width: 40rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-top: .3rem; }
 .flash { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-size: clamp(3rem, 16vmin, 8rem); color: #0d1220; pointer-events: none; }
 .flash.good { background: var(--good); }
 .flash.pass { background: var(--pass); }
@@ -225,11 +239,15 @@ h1 span { color: var(--brass); }
   </div>
   <div class="card" id="card">
     <img class="cardimg" id="cardImg" alt="" hidden>
-    <div class="info">
+    <div class="info" id="info">
       <div class="meta" id="meta"></div>
       <div class="word" id="word"></div>
       <div class="subword" id="subword"></div>
+      <div class="stats" id="stats"></div>
+      <div class="tags" id="tags"></div>
       <div class="rules" id="rules"></div>
+      <div class="flavour" id="flavour"></div>
+      <div class="foot" id="foot"></div>
     </div>
   </div>
   <div class="flash" id="flash" hidden></div>
@@ -255,8 +273,8 @@ const $ = id => document.getElementById(id);
 const screens = ["home", "ready", "play", "end"];
 const show = name => screens.forEach(s => $(s).hidden = s !== name);
 
-const CAT_ORDER = ["Legend", "Champion Unit", "Unit", "Spell", "Signature Spell", "Gear", "Battlefield"];
-const CAT_LABEL = { "Legend": "Legends", "Champion Unit": "Champion Unit", "Unit": "Units", "Spell": "Spells", "Signature Spell": "Signature Spell", "Gear": "Gear", "Battlefield": "Battlefields" };
+const CAT_ORDER = ["Legend", "Champion Unit", "Unit", "Signature Unit", "Spell", "Signature Spell", "Gear", "Signature Gear", "Battlefield"];
+const CAT_LABEL = { "Legend": "Legends", "Champion Unit": "Champion Unit", "Unit": "Units", "Signature Unit": "Signature Unit", "Spell": "Spells", "Signature Spell": "Signature Spell", "Gear": "Gear", "Signature Gear": "Signature Gear", "Battlefield": "Battlefields" };
 // Riftbound domains and their card colors.
 const DOMAIN_COLOR = { Fury: "red", Calm: "green", Mind: "blue", Body: "orange", Chaos: "purple", Order: "yellow" };
 const domainList = c => (c.domain || []).filter(Boolean);
@@ -462,15 +480,52 @@ function nextCard() {
     if (DOMAIN_COLOR[d]) s.className = "dom-" + DOMAIN_COLOR[d];
     meta.append(s);
   });
-  meta.append((domainList(current).length ? " " : "") + current.cat + " · " + (setName[current.set] || current.set));
+  meta.append((domainList(current).length ? " " : "") + current.cat);
+
+  // Costs and might
+  const stats = $("stats"); stats.replaceChildren();
+  [["Energy", current.energy], ["Power", current.power], ["Might", current.might]].forEach(([label, v]) => {
+    if (v == null) return;
+    const s = document.createElement("span"); s.className = "stat";
+    const b = document.createElement("b"); b.textContent = v;
+    const l = document.createElement("span"); l.textContent = label;
+    s.append(b, l); stats.append(s);
+  });
+  stats.hidden = !stats.childElementCount;
+
+  // Tags (champion, region, tribe)
+  const tags = $("tags"); tags.replaceChildren();
+  (current.tags || []).forEach(t => { const s = document.createElement("span"); s.className = "tag"; s.textContent = t; tags.append(s); });
+  tags.hidden = !tags.childElementCount;
+
   $("rules").textContent = current.text || "";
   $("rules").hidden = !current.text;
+  $("flavour").textContent = current.flavour || "";
+  $("flavour").hidden = !current.flavour;
+  $("foot").textContent = [setName[current.set] || current.set, current.num != null ? "#" + current.num : null, current.rarity, current.artist ? "Art: " + current.artist : null].filter(Boolean).join(" · ");
+
   showImage(current);
+  fitInfo();
   if (pool.length) preload(pool[pool.length - 1]);
 }
 
+// Shrink the details text until it all fits beside (or under) the card.
+function fitInfo() {
+  const info = $("info"), img = $("cardImg");
+  if (phase !== "play" || !info.clientHeight) return;
+  const right = !img.hidden && img.naturalWidth ? Math.round(img.getBoundingClientRect().right) : 0;
+  $("play").style.setProperty("--card-right", right + "px");
+  let size = Math.min(24, Math.max(14, Math.round(Math.min(innerWidth, innerHeight) / 18)));
+  info.style.fontSize = size + "px";
+  while (size > 9 && (info.scrollHeight > info.clientHeight + 1 || info.scrollWidth > info.clientWidth + 1)) {
+    size -= 0.5;
+    info.style.fontSize = size + "px";
+  }
+}
+addEventListener("resize", () => fitInfo());
+
 // Card art from Riot's CDN, resized to a phone-friendly width.
-const imgUrl = c => c.img ? c.img + (c.img.includes("?") ? "&" : "?") + "w=" + (c.wide ? 900 : 640) : null;
+const imgUrl = c => c.img ? c.img + (c.img.includes("?") ? "&" : "?") + "w=" + (c.wide ? 1038 : 744) : null;
 const preloaded = new Map();
 function preload(c) {
   const u = imgUrl(c);
@@ -485,7 +540,8 @@ function showImage(c) {
   if (!u) { img.hidden = true; $("card").classList.remove("has-img"); return; }
   img.classList.toggle("wide", !!c.wide);
   img.alt = c.name;
-  img.onerror = () => { img.hidden = true; $("card").classList.remove("has-img"); };
+  img.onerror = () => { img.hidden = true; $("card").classList.remove("has-img"); fitInfo(); };
+  img.onload = () => fitInfo();   // card width changes the space left for details
   img.src = u;
   img.hidden = false;
   $("card").classList.add("has-img");
@@ -526,7 +582,7 @@ function startRound() {
   buildPool(); nextCard();
   $("score").textContent = "0";
   endAt = performance.now() + roundLen() * 1000;
-  show("play"); renderTime();
+  show("play"); fitInfo(); renderTime();
   tick = setInterval(renderTime, 100);
 }
 function renderTime() {

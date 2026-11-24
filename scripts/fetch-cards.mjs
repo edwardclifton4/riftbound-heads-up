@@ -22,23 +22,39 @@ const baseName = name => name
   .replace(/\s+/g, " ")
   .trim();
 
-// Card text uses symbol codes like ":rb_exhaust:" or ":rb_energy_2:". Turn them into words.
-const cleanText = t => (t || "")
-  .replace(/:rb_([a-z0-9_]+):/gi, (_, code) => {
+// Card text uses symbol codes like ":rb_exhaust:" or ":rb_energy_2::rb_rune_chaos:".
+// Turn each run of symbols into words: "6 energy + 2 Chaos power", "Exhaust", "Might".
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+function symbolsToWords(run) {
+  const codes = [...run.matchAll(/:rb_([a-z0-9_]+):/gi)].map(m => m[1].toLowerCase());
+  const parts = [];
+  const runes = new Map();
+  for (const code of codes) {
     let m;
-    if ((m = code.match(/^energy_(\d+)$/))) return `${m[1]} energy`;
-    if (code === "rune_rainbow") return "any rune";
-    if ((m = code.match(/^rune_(\w+)$/))) return `${m[1]} rune`;
-    return code.replace(/_/g, " ");
-  })
-  .replace(/\s+/g, " ")
+    if ((m = code.match(/^energy_(\d+)$/))) parts.push(`${m[1]} energy`);
+    else if ((m = code.match(/^rune_(\w+)$/))) { const d = m[1] === "rainbow" ? "any" : cap(m[1]); runes.set(d, (runes.get(d) || 0) + 1); }
+    else parts.push(cap(code.replace(/_/g, " ")));
+  }
+  for (const [d, n] of runes) parts.push(`${n} ${d} power`);
+  return ` ${parts.join(" + ")} `;
+}
+const decode = s => s.replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&");
+const cleanText = t => decode((t || "")
+  .replace(/<br\s*\/?>/gi, "\n")
+  .replace(/<\/p>\s*<p[^>]*>/gi, "\n")
+  .replace(/<[^>]+>/g, ""))
+  .replace(/(?::rb_[a-z0-9_]+:)+/gi, symbolsToWords)
+  .replace(/[ \t]+/g, " ")
+  .replace(/ ([,.:;)])/g, "$1")
+  .replace(/\( /g, "(")
+  .replace(/ *\n */g, "\n")
   .trim();
 
 function category(c) {
   const type = c.classification?.type || "Other";
   const sup = c.classification?.supertype || "";
   if (type === "Unit" && /champion/i.test(sup)) return "Champion Unit";
-  if (type === "Spell" && /signature/i.test(sup)) return "Signature Spell";
+  if (/signature/i.test(sup) && ["Spell", "Unit", "Gear"].includes(type)) return `Signature ${type}`;
   return type;
 }
 
@@ -80,7 +96,14 @@ for (const c of raw) {
     signature: !!c.metadata?.signature || !!prev?.signature,
     domain: c.classification?.domain || [],
     rarity: c.classification?.rarity || null,
-    text: cleanText(c.text?.plain).slice(0, 220),
+    text: cleanText(c.text?.rich || c.text?.plain),
+    flavour: cleanText(c.text?.flavour) || null,
+    energy: c.attributes?.energy ?? null,
+    power: c.attributes?.power ?? null,
+    might: c.attributes?.might ?? null,
+    tags: c.tags || [],
+    num: c.collector_number ?? null,
+    artist: c.media?.artist || null,
     img: c.media?.image_url || prev?.img || null,
     wide: c.orientation === "landscape",
   });
