@@ -44,7 +44,7 @@
       <rect x="44" y="58" width="424" height="244" rx="34" fill="url(#card)"/>
       <rect x="60" y="74" width="392" height="212" rx="22" fill="none" stroke="#0d1220" stroke-opacity=".28" stroke-width="5"/>
       <text x="256" y="152" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-weight="900" font-size="60" letter-spacing="2" fill="#0d1220" textLength="300" lengthAdjust="spacingAndGlyphs">RIFTBOUND</text>
-      <text x="256" y="250" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-weight="900" font-size="88" fill="#0d1220" textLength="350" lengthAdjust="spacingAndGlyphs">Heads up!</text>
+      <text x="256" y="250" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-weight="900" font-size="88" fill="#0d1220" textLength="350" lengthAdjust="spacingAndGlyphs">Heads-Up!</text>
     </g>
 
     <!-- hands gripping the card -->
